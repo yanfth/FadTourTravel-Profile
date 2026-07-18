@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import HeroPicture from "./assets/HeroPicture.jpeg";
+import './App.css';
 
 export function useScrollReveal() {
   const ref = useRef(null);
@@ -496,16 +497,6 @@ function Header({ page, setPage }) {
           ))}
         </div>
       )}
-
-      <style>{`
-        @media (max-width: 800px) {
-          .fd-desktop-nav { display: none !important; }
-          .fd-mobile-nav { display: flex !important; }
-        }
-        @media (min-width: 801px) {
-          .fd-mobile-nav { display: none !important; }
-        }
-      `}</style>
     </header>
   );
 }
@@ -704,14 +695,6 @@ function SearchBar({ setPage }) {
         >
           <Icon name="search" size={16} /> Search
         </button>
-        <style>{`
-          .fd-search-bar { border-radius: 999px; }
-          @media (max-width: 720px) {
-            .fd-search-divider { display: none; }
-            .fd-search-bar { border-radius: 24px; justify-content: center; padding: 14px; gap: 12px; }
-            .fd-search-field { min-width: 100% !important; padding: 10px 14px !important; }
-          }
-        `}</style>
       </div>
     </FadeUp>
   );
@@ -910,16 +893,6 @@ function HomePage({ setPage, goToBooking }) {
         >
           <SearchBar setPage={setPage} />
         </div>
-
-        <style>{`
-          @media (max-width: 860px) {
-            .fd-hero-grid { grid-template-columns: 1fr !important; }
-            .fd-hero-bg-desktop { display: none !important; }
-          }
-          @media (min-width: 861px) {
-            .fd-hero-img-mobile { display: none !important; }
-          }
-        `}</style>
       </section>
 
       {/* Categories */}
@@ -957,12 +930,6 @@ function HomePage({ setPage, goToBooking }) {
             </FadeUp>
           ))}
         </div>
-        <style>{`
-          .fd-cat-circle:hover { transform: scale(1.08); border-color: ${P.primary} !important; }
-          @media (max-width: 700px) {
-            .fd-cat-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; }
-          }
-        `}</style>
       </section>
 
       {/* Popular Destinations */}
@@ -1082,11 +1049,6 @@ function HomePage({ setPage, goToBooking }) {
             />
           </FadeUp>
         </div>
-        <style>{`
-          @media (max-width: 860px) {
-            .fd-hero-grid-about { grid-template-columns: 1fr !important; }
-          }
-        `}</style>
       </section>
 
       {/* Client Review */}
@@ -1154,16 +1116,6 @@ function HomePage({ setPage, goToBooking }) {
           </div>
         </FadeUp>
       </section>
-
-      <style>{`
-        @media (max-width: 860px) {
-          .fd-grid-3 { grid-template-columns: 1fr !important; }
-        }
-        .fd-dest-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
-        }
-      `}</style>
     </>
   );
 }
@@ -1245,12 +1197,6 @@ function AboutPage() {
           </div>
         </FadeUp>
       </div>
-      <style>{`
-        @media (max-width: 700px) {
-          .fd-grid-3 { grid-template-columns: 1fr !important; }
-          .fd-hero-grid-about { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1267,11 +1213,6 @@ function PackagesPage({ goToBooking }) {
           <DestinationCard key={d.id} d={d} onSelect={goToBooking} />
         ))}
       </div>
-      <style>{`
-        @media (max-width: 860px) {
-          .fd-grid-3 { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1443,11 +1384,6 @@ function BookingPage({ presetDestination }) {
           </form>
         )}
       </FadeUp>
-      <style>{`
-        @media (max-width: 560px) {
-          .fd-form-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1596,11 +1532,6 @@ function ContactPage() {
           )}
         </FadeUp>
       </div>
-      <style>{`
-        @media (max-width: 700px) {
-          .fd-hero-grid-about { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1774,40 +1705,6 @@ export default function FadtourApp() {
       <Fireflies />
       <div style={{ position: "relative", zIndex: 1 }}>
         <Header page={page} setPage={changePage} />
-      <style>{`
-        html { scroll-behavior: smooth; }
-        * { box-sizing: border-box; }
-        .fade-up {
-          opacity: 0;
-          transform: translateY(40px);
-          transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-        .fade-up.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        input:focus, textarea:focus, select:focus {
-          border-color: ${P.primary} !important;
-          box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
-        }
-        button:hover {
-          filter: brightness(1.05);
-        }
-        @keyframes firefly-drift {
-          0% { transform: translate(0, 0); opacity: 0; }
-          10% { opacity: 0.8; }
-          90% { opacity: 0.8; }
-          100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
-        }
-        .firefly {
-          position: absolute;
-          background: ${P.accent};
-          border-radius: 50%;
-          box-shadow: 0 0 8px 2px ${P.accent}, 0 0 14px 4px rgba(249, 122, 50, 0.4);
-          opacity: 0;
-          animation: firefly-drift linear infinite;
-        }
-      `}</style>
       <FadeUp id="home">
         <HomePage setPage={changePage} goToBooking={goToBooking} />
       </FadeUp>
