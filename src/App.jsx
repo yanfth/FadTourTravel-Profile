@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import HeroPicture from "./assets/HeroPicture.jpeg";
 
 export function useScrollReveal() {
   const ref = useRef(null);
@@ -725,19 +726,44 @@ function HomePage({ setPage, goToBooking }) {
         style={{
           position: "relative",
           overflow: "hidden",
-          background: P.bgPage,
-          padding: "100px 32px 0",
+          background: "#FFFFFF",
+          padding: "100px 0 0",
+          zIndex: 20,
         }}
       >
+        {/* Desktop Absolute Image */}
+        <div
+          className="fd-hero-bg-desktop"
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            right: 0,
+            width: "55vw",
+            backgroundImage: `url(${HeroPicture})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: 0,
+          }}
+        >
+          {/* Left Fade */}
+          <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: "30%", background: "linear-gradient(to right, #FFFFFF 0%, rgba(255,255,255,0) 100%)" }} />
+          {/* Bottom Fade */}
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to bottom, rgba(255,255,255,0) 0%, #FFFFFF 100%)" }} />
+        </div>
+
         <div
           style={{
             maxWidth: 1200,
             margin: "0 auto",
+            padding: "0 32px",
             display: "grid",
             gridTemplateColumns: "1fr 1.1fr",
             gap: 48,
             alignItems: "center",
             minHeight: "80vh",
+            position: "relative",
+            zIndex: 1,
           }}
           className="fd-hero-grid"
         >
@@ -841,25 +867,35 @@ function HomePage({ setPage, goToBooking }) {
             </div>
           </FadeUp>
 
-          {/* Image Grid / Mosaic */}
-          <FadeUp>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gridTemplateRows: "repeat(3, 120px)",
-                gap: 12,
-              }}
-              className="fd-hero-mosaic"
-            >
-              <div style={{ gridColumn: "1 / 3", gridRow: "1 / 3", borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("santorini greek island sunset", 800, 600)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("bali rice terrace indonesia", 400, 400)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("komodo island boat indonesia", 400, 400)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("indonesian beach sunset palm", 400, 300)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("borobudur temple indonesia sunrise", 400, 300)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("lake toba north sumatra", 400, 300)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-            </div>
-          </FadeUp>
+          {/* Mobile Hero Image (hidden on desktop) */}
+          <div className="fd-hero-img-mobile">
+            <FadeUp>
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  minHeight: 400,
+                  borderRadius: 20,
+                  position: "relative",
+                  overflow: "hidden",
+                  backgroundImage: `url(${HeroPicture})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <div 
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: "50%",
+                    background: "linear-gradient(to bottom, rgba(255,255,255,0) 0%, #FFFFFF 100%)"
+                  }}
+                />
+              </div>
+            </FadeUp>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -878,7 +914,10 @@ function HomePage({ setPage, goToBooking }) {
         <style>{`
           @media (max-width: 860px) {
             .fd-hero-grid { grid-template-columns: 1fr !important; }
-            .fd-hero-mosaic { grid-template-rows: repeat(3, 100px) !important; }
+            .fd-hero-bg-desktop { display: none !important; }
+          }
+          @media (min-width: 861px) {
+            .fd-hero-img-mobile { display: none !important; }
           }
         `}</style>
       </section>
@@ -900,9 +939,9 @@ function HomePage({ setPage, goToBooking }) {
                 <div
                   style={{
                     width: 100,
-                    height: 100,
-                    borderRadius: "50%",
-                    backgroundImage: `url(${photo(c.img, 300, 300)})`,
+                    height: 140,
+                    borderRadius: 999,
+                    backgroundImage: `url(${photo(c.img, 300, 400)})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     border: `3px solid ${P.border}`,
@@ -946,7 +985,7 @@ function HomePage({ setPage, goToBooking }) {
       </section>
 
       {/* Services Section */}
-      <section style={{ background: P.bgSoft, padding: "80px 32px" }}>
+      <section style={{ background: "transparent", padding: "80px 32px" }}>
         <div
           style={{
             maxWidth: 1200,
@@ -1646,6 +1685,46 @@ function Footer({ setPage }) {
   );
 }
 
+/* ─── Fireflies Animation ─── */
+function Fireflies() {
+  const [dots, setDots] = useState([]);
+  useEffect(() => {
+    // Generate 40 random fireflies
+    const newDots = Array.from({ length: 40 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() * 4 + 2, // 2px to 6px
+      delay: Math.random() * 5,
+      duration: Math.random() * 5 + 5, // 5s to 10s
+      tx: (Math.random() - 0.5) * 150, // -75px to 75px
+      ty: (Math.random() - 0.5) * 150, // -75px to 75px
+    }));
+    setDots(newDots);
+  }, []);
+
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 0 }}>
+      {dots.map((d) => (
+        <div
+          key={d.id}
+          className="firefly"
+          style={{
+            left: `${d.left}%`,
+            top: `${d.top}%`,
+            width: d.size,
+            height: d.size,
+            animationDelay: `${d.delay}s`,
+            animationDuration: `${d.duration}s`,
+            "--tx": `${d.tx}px`,
+            "--ty": `${d.ty}px`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /* ─── App Root ─── */
 export default function FadtourApp() {
   ensureFonts();
@@ -1692,7 +1771,9 @@ export default function FadtourApp() {
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: P.bgPage, color: P.text, minHeight: "100vh" }}>
-      <Header page={page} setPage={changePage} />
+      <Fireflies />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <Header page={page} setPage={changePage} />
       <style>{`
         html { scroll-behavior: smooth; }
         * { box-sizing: border-box; }
@@ -1712,6 +1793,20 @@ export default function FadtourApp() {
         button:hover {
           filter: brightness(1.05);
         }
+        @keyframes firefly-drift {
+          0% { transform: translate(0, 0); opacity: 0; }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+        }
+        .firefly {
+          position: absolute;
+          background: ${P.accent};
+          border-radius: 50%;
+          box-shadow: 0 0 8px 2px ${P.accent}, 0 0 14px 4px rgba(249, 122, 50, 0.4);
+          opacity: 0;
+          animation: firefly-drift linear infinite;
+        }
       `}</style>
       <FadeUp id="home">
         <HomePage setPage={changePage} goToBooking={goToBooking} />
@@ -1726,9 +1821,10 @@ export default function FadtourApp() {
         <BookingPage presetDestination={presetDestination} />
       </FadeUp>
       <FadeUp id="contact">
-        <ContactPage />
-      </FadeUp>
-      <Footer setPage={changePage} />
+          <ContactPage />
+        </FadeUp>
+        <Footer setPage={changePage} />
+      </div>
     </div>
   );
 }
