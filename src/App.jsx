@@ -1,4 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
+export function useScrollReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+}
+
+export function FadeUp({ children, style, className = "", id }) {
+  const ref = useScrollReveal();
+  return (
+    <div ref={ref} id={id} className={`fade-up ${className}`} style={style}>
+      {children}
+    </div>
+  );
+}
 
 const FONT_IMPORT_ID = "fadtour-fonts";
 
@@ -9,25 +40,25 @@ function ensureFonts() {
   link.id = FONT_IMPORT_ID;
   link.rel = "stylesheet";
   link.href =
-    "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;700&display=swap";
+    "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap";
   document.head.appendChild(link);
 }
 
-const PALETTE = {
-  deep: "#0E3B43",
-  deep2: "#123F49",
-  coral: "#E8734A",
-  gold: "#D9A441",
-  sand: "#F7F3EA",
-  sandDeep: "#EFE7D6",
-  ink: "#12242A",
-  mute: "#5B6E70",
-  line: "#DAD2BE",
-  blue: "#2F6FED",
-  blueDeep: "#1E4FC4",
-  blueTint: "#EAF0FE",
-  paper: "#FFFFFF",
-  page: "#F6F8FC",
+const P = {
+  primary: "#294350",
+  primaryDark: "#1D313B",
+  primaryLight: "#E3E9EC",
+  accent: "#F97A32",
+  dark: "#090909",
+  darkSoft: "#294350",
+  text: "#1D313B",
+  textLight: "#5A6D77",
+  border: "#DCE1E3",
+  bg: "#FFFFFF",
+  bgSoft: "#EFEFF0",
+  bgPage: "#EFEFF0",
+  success: "#10B981",
+  coral: "#F97A32",
 };
 
 function photo(query, w = 800, h = 600) {
@@ -45,7 +76,7 @@ const NAV = [
 const DESTINATIONS = [
   {
     id: "raja-ampat",
-    img: "raja ampat islands",
+    img: "raja ampat islands turquoise water aerial view",
     name: "Raja Ampat",
     location: "Papua Barat",
     price: "Rp 8.500.000",
@@ -57,7 +88,7 @@ const DESTINATIONS = [
   },
   {
     id: "labuan-bajo",
-    img: "labuan bajo komodo boat",
+    img: "labuan bajo komodo boat sailing",
     name: "Labuan Bajo",
     location: "Nusa Tenggara Timur",
     price: "Rp 6.200.000",
@@ -69,7 +100,7 @@ const DESTINATIONS = [
   },
   {
     id: "bromo-ijen",
-    img: "mount bromo sunrise",
+    img: "mount bromo sunrise volcanic landscape",
     name: "Bromo & Ijen",
     location: "Jawa Timur",
     price: "Rp 3.100.000",
@@ -81,7 +112,7 @@ const DESTINATIONS = [
   },
   {
     id: "toraja",
-    img: "toraja traditional village",
+    img: "toraja traditional village tongkonan",
     name: "Toraja",
     location: "Sulawesi Selatan",
     price: "Rp 4.700.000",
@@ -93,7 +124,7 @@ const DESTINATIONS = [
   },
   {
     id: "belitung",
-    img: "belitung island beach rocks",
+    img: "belitung island beach granite rocks crystal water",
     name: "Belitung",
     location: "Bangka Belitung",
     price: "Rp 3.900.000",
@@ -105,7 +136,7 @@ const DESTINATIONS = [
   },
   {
     id: "yogyakarta",
-    img: "borobudur temple sunrise",
+    img: "borobudur temple sunrise fog",
     name: "Yogyakarta",
     location: "DI Yogyakarta",
     price: "Rp 2.400.000",
@@ -117,6 +148,16 @@ const DESTINATIONS = [
   },
 ];
 
+const CATEGORIES = [
+  { label: "Gunung", img: "mountain landscape photography" },
+  { label: "Pantai", img: "tropical beach crystal water" },
+  { label: "Budaya", img: "indonesian cultural temple" },
+  { label: "Petualangan", img: "adventure hiking trail" },
+  { label: "Kota", img: "modern city skyline night" },
+  { label: "Alam", img: "beautiful nature waterfall tropical" },
+];
+
+/* ─── Icon ─── */
 function Icon({ name, size = 18, style }) {
   const common = {
     width: size,
@@ -181,33 +222,113 @@ function Icon({ name, size = 18, style }) {
         <path d="M12 7v13M7 13H5a7 7 0 0 0 7 7 7 7 0 0 0 7-7h-2M8 13h8" />
       </>
     ),
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="M21 21l-4.3-4.3" />
+      </>
+    ),
+    quote: <path d="M10 8H6a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2l-2 4M20 8h-4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2l-2 4" />,
+    car: (
+      <>
+        <path d="M5 17h14v-5l-2-5H7l-2 5v5z" />
+        <circle cx="7.5" cy="17" r="1.5" />
+        <circle cx="16.5" cy="17" r="1.5" />
+      </>
+    ),
+    hotel: (
+      <>
+        <path d="M3 21V7l9-4 9 4v14" />
+        <rect x="9" y="13" width="6" height="8" rx="1" />
+        <path d="M9 9h6" />
+      </>
+    ),
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
 
+/* ─── Section Title ─── */
+function SectionTitle({ children, sub }) {
+  return (
+    <FadeUp>
+      <div style={{ marginBottom: 40 }}>
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "clamp(26px, 3.5vw, 36px)",
+            fontWeight: 700,
+            color: P.dark,
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
+          {children}
+          <span
+            style={{
+              flex: 1,
+              height: 2,
+              background: `linear-gradient(90deg, ${P.primary}, transparent)`,
+              display: "inline-block",
+              marginTop: 4,
+            }}
+          />
+        </h2>
+        {sub && (
+          <p
+            style={{
+              fontSize: 14.5,
+              color: P.textLight,
+              margin: "10px 0 0",
+              maxWidth: 520,
+              lineHeight: 1.7,
+            }}
+          >
+            {sub}
+          </p>
+        )}
+      </div>
+    </FadeUp>
+  );
+}
+
+/* ─── Header ─── */
 function Header({ page, setPage }) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <header
       style={{
-        position: "sticky",
+        position: "fixed",
         top: 0,
-        zIndex: 40,
-        background: "rgba(255,255,255,0.92)",
-        backdropFilter: "blur(6px)",
-        borderBottom: `1px solid ${PALETTE.line}`,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        background: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.6)",
+        backdropFilter: "blur(12px)",
+        boxShadow: scrolled ? "0 2px 20px rgba(0,0,0,0.06)" : "none",
+        transition: "all 0.3s ease",
       }}
     >
       <div
         style={{
-          maxWidth: 1160,
+          maxWidth: 1200,
           margin: "0 auto",
-          padding: "16px 28px",
+          padding: "14px 32px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
+        {/* Logo */}
         <button
           onClick={() => setPage("home")}
           style={{
@@ -222,35 +343,38 @@ function Header({ page, setPage }) {
         >
           <span
             style={{
-              width: 34,
-              height: 34,
+              width: 36,
+              height: 36,
               borderRadius: "50%",
-              background: PALETTE.blue,
+              background: `linear-gradient(135deg, ${P.primary}, ${P.primaryDark})`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               color: "#fff",
+              boxShadow: "0 4px 12px rgba(37,99,235,0.3)",
             }}
           >
             <Icon name="compass" size={18} />
           </span>
           <span
             style={{
-              fontFamily: "'Fraunces', serif",
-              fontWeight: 600,
-              fontSize: 20,
-              color: PALETTE.deep,
-              letterSpacing: "-0.01em",
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 700,
+              fontSize: 22,
+              color: P.dark,
+              letterSpacing: "-0.02em",
             }}
           >
             FADTOUR
           </span>
         </button>
 
+        {/* Desktop Nav */}
         <nav
           style={{
             display: "flex",
             gap: 4,
+            alignItems: "center",
           }}
           className="fd-desktop-nav"
         >
@@ -262,65 +386,88 @@ function Header({ page, setPage }) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                padding: "8px 14px",
-                fontFamily: "'Manrope', sans-serif",
-                fontSize: 14.5,
-                color: page === n.key ? PALETTE.coral : PALETTE.ink,
+                padding: "8px 16px",
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 14,
+                color: page === n.key ? P.primary : P.text,
                 fontWeight: page === n.key ? 700 : 500,
-                borderBottom: page === n.key ? `2px solid ${PALETTE.coral}` : "2px solid transparent",
+                borderRadius: 8,
+                transition: "all 0.2s ease",
+                position: "relative",
               }}
             >
               {n.label}
+              {page === n.key && (
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: 2,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 20,
+                    height: 3,
+                    borderRadius: 2,
+                    background: P.primary,
+                  }}
+                />
+              )}
             </button>
           ))}
         </nav>
 
+        {/* CTA */}
         <button
           onClick={() => setPage("booking")}
           className="fd-desktop-nav"
           style={{
-            background: PALETTE.blue,
+            background: `linear-gradient(135deg, ${P.primary}, ${P.primaryDark})`,
             color: "#fff",
             border: "none",
             borderRadius: 999,
-            padding: "10px 20px",
-            fontFamily: "'Manrope', sans-serif",
-            fontWeight: 700,
+            padding: "10px 24px",
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600,
             fontSize: 14,
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: 6,
+            boxShadow: "0 4px 14px rgba(37,99,235,0.3)",
+            transition: "all 0.2s ease",
           }}
         >
           Mulai Perjalanan <Icon name="arrow" size={15} />
         </button>
 
+        {/* Mobile Toggle */}
         <button
           onClick={() => setOpen(!open)}
           className="fd-mobile-nav"
           style={{
             display: "none",
             background: "none",
-            border: `1px solid ${PALETTE.line}`,
-            borderRadius: 8,
+            border: `1px solid ${P.border}`,
+            borderRadius: 10,
             padding: 8,
-            color: PALETTE.deep,
+            color: P.dark,
+            cursor: "pointer",
           }}
         >
-          <Icon name={open ? "close" : "menu"} size={20} />
+          <Icon name={open ? "close" : "menu"} size={22} />
         </button>
       </div>
 
+      {/* Mobile Dropdown */}
       {open && (
         <div
           className="fd-mobile-nav"
           style={{
-            borderTop: `1px solid ${PALETTE.line}`,
-            padding: "10px 28px 18px",
+            borderTop: `1px solid ${P.border}`,
+            padding: "12px 32px 20px",
             display: "flex",
             flexDirection: "column",
             gap: 4,
+            background: "#fff",
           }}
         >
           {NAV.map((n) => (
@@ -332,13 +479,15 @@ function Header({ page, setPage }) {
               }}
               style={{
                 textAlign: "left",
-                background: "none",
+                background: page === n.key ? P.primaryLight : "none",
                 border: "none",
-                padding: "10px 4px",
-                fontFamily: "'Manrope', sans-serif",
+                padding: "12px 14px",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 15,
-                color: page === n.key ? PALETTE.coral : PALETTE.ink,
+                color: page === n.key ? P.primary : P.text,
                 fontWeight: page === n.key ? 700 : 500,
+                borderRadius: 10,
+                cursor: "pointer",
               }}
             >
               {n.label}
@@ -360,361 +509,367 @@ function Header({ page, setPage }) {
   );
 }
 
-function Eyebrow({ children }) {
-  return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        fontFamily: "'Manrope', sans-serif",
-        fontSize: 12.5,
-        fontWeight: 700,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
-        color: PALETTE.coral,
-        marginBottom: 14,
-      }}
-    >
-      <span style={{ width: 22, height: 1.5, background: PALETTE.coral, display: "inline-block" }} />
-      {children}
-    </div>
-  );
-}
-
+/* ─── Destination Card ─── */
 function DestinationCard({ d, onSelect }) {
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 18,
-        border: `1px solid ${PALETTE.line}`,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <FadeUp>
       <div
+        className="fd-dest-card"
         style={{
-          height: 150,
-          position: "relative",
-          backgroundImage: `linear-gradient(180deg, rgba(14,59,67,0) 45%, rgba(14,59,67,0.55) 100%), url(${photo(d.img)})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: "#fff",
+          borderRadius: 20,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
         }}
       >
-        <span
-          style={{
-            position: "absolute",
-            top: 12,
-            left: 12,
-            background: "rgba(255,255,255,0.95)",
-            color: PALETTE.blueDeep,
-            fontSize: 11.5,
-            fontWeight: 700,
-            padding: "4px 10px",
-            borderRadius: 999,
-            fontFamily: "'Manrope', sans-serif",
-          }}
-        >
-          {d.tag}
-        </span>
-        <span
-          style={{
-            position: "absolute",
-            top: 10,
-            right: 10,
-            width: 28,
-            height: 28,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.9)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: PALETTE.coral,
-          }}
-        >
-          <Icon name="star" size={14} style={{ color: PALETTE.coral }} />
-        </span>
-        <span
-          style={{
-            position: "absolute",
-            left: 14,
-            bottom: 10,
-            color: "#fff",
-            fontFamily: "'Fraunces', serif",
-            fontSize: 20,
-            fontWeight: 600,
-            textShadow: "0 1px 4px rgba(0,0,0,0.3)",
-          }}
-        >
-          {d.name}
-        </span>
-      </div>
-      <div style={{ padding: "16px 18px 18px", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, color: PALETTE.mute, fontSize: 13 }}>
-          <Icon name="pin" size={14} /> {d.location}
-          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, color: PALETTE.gold, fontWeight: 700 }}>
-            <Icon name="star" size={13} style={{ color: PALETTE.gold }} /> {d.rating}
-          </span>
-        </div>
-        <p style={{ margin: 0, fontSize: 13.5, color: PALETTE.mute, lineHeight: 1.6 }}>{d.blurb}</p>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: "auto",
-            paddingTop: 12,
-            borderTop: `1px solid ${PALETTE.line}`,
+            height: 180,
+            position: "relative",
+            backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.5) 100%), url(${photo(d.img)})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         >
-          <div>
-            <div style={{ fontSize: 11.5, color: PALETTE.mute }}>{d.days}</div>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 17, fontWeight: 600, color: PALETTE.deep }}>
-              {d.price}
-            </div>
-          </div>
-          <button
-            onClick={() => onSelect(d)}
+          <span
             style={{
-              background: PALETTE.blue,
+              position: "absolute",
+              top: 14,
+              left: 14,
+              background: P.primary,
               color: "#fff",
-              border: "none",
-              borderRadius: 999,
-              padding: "9px 16px",
-              fontSize: 13,
+              fontSize: 11,
               fontWeight: 700,
-              cursor: "pointer",
-              fontFamily: "'Manrope', sans-serif",
+              padding: "5px 12px",
+              borderRadius: 999,
+              fontFamily: "'Inter', sans-serif",
+              letterSpacing: "0.03em",
             }}
           >
-            Pilih Paket
-          </button>
+            {d.tag}
+          </span>
+          <span
+            style={{
+              position: "absolute",
+              top: 14,
+              right: 14,
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.9)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: P.accent,
+              backdropFilter: "blur(4px)",
+            }}
+          >
+            <Icon name="star" size={14} style={{ color: P.accent, fill: P.accent }} />
+          </span>
+          <span
+            style={{
+              position: "absolute",
+              left: 16,
+              bottom: 14,
+              color: "#fff",
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 22,
+              fontWeight: 700,
+              textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+            }}
+          >
+            {d.name}
+          </span>
+        </div>
+        <div style={{ padding: "18px 20px 20px", display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, color: P.textLight, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
+            <Icon name="pin" size={14} style={{ color: P.primary }} /> {d.location}
+            <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, color: P.accent, fontWeight: 700 }}>
+              <Icon name="star" size={13} style={{ color: P.accent }} /> {d.rating}
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: 13.5, color: P.textLight, lineHeight: 1.65, fontFamily: "'Inter', sans-serif" }}>{d.blurb}</p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: "auto",
+              paddingTop: 14,
+              borderTop: `1px solid ${P.border}`,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 11.5, color: P.textLight, fontFamily: "'Inter', sans-serif" }}>{d.days}</div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: P.dark }}>
+                {d.price}
+              </div>
+            </div>
+            <button
+              onClick={() => onSelect(d)}
+              style={{
+                background: P.primary,
+                color: "#fff",
+                border: "none",
+                borderRadius: 999,
+                padding: "10px 20px",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+                transition: "all 0.2s ease",
+                boxShadow: "0 2px 8px rgba(37,99,235,0.25)",
+              }}
+            >
+              Pilih Paket
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </FadeUp>
   );
 }
 
+/* ─── Search Bar ─── */
 function SearchBar({ setPage }) {
   const fieldStyle = {
     display: "flex",
     flexDirection: "column",
-    gap: 2,
-    padding: "6px 20px",
+    gap: 3,
+    padding: "8px 22px",
     flex: 1,
     minWidth: 130,
   };
-  const iconWrap = { display: "flex", alignItems: "center", gap: 8 };
   return (
-    <div
-      style={{
-        background: "#fff",
-        boxShadow: "0 18px 40px rgba(20,40,90,0.12)",
-        border: `1px solid ${PALETTE.line}`,
-        display: "flex",
-        alignItems: "stretch",
-        padding: "6px",
-        gap: 0,
-        flexWrap: "wrap",
-      }}
-      className="fd-search-bar"
-    >
-      <div style={fieldStyle} className="fd-search-field">
-        <span style={{ ...iconWrap, fontSize: 11.5, fontWeight: 700, color: PALETTE.mute }}>
-          <Icon name="pin" size={13} style={{ color: PALETTE.blue }} /> Mau kemana?
-        </span>
-        <span style={{ fontSize: 13.5, color: PALETTE.ink, fontWeight: 600 }}>Cari destinasi</span>
-      </div>
-      <div style={{ width: 1, background: PALETTE.line, margin: "8px 0" }} className="fd-search-divider" />
-      <div style={fieldStyle} className="fd-search-field">
-        <span style={{ ...iconWrap, fontSize: 11.5, fontWeight: 700, color: PALETTE.mute }}>
-          <Icon name="calendar" size={13} style={{ color: PALETTE.blue }} /> Berangkat
-        </span>
-        <span style={{ fontSize: 13.5, color: PALETTE.ink, fontWeight: 600 }}>Tambah tanggal</span>
-      </div>
-      <div style={{ width: 1, background: PALETTE.line, margin: "8px 0" }} className="fd-search-divider" />
-      <div style={fieldStyle} className="fd-search-field">
-        <span style={{ ...iconWrap, fontSize: 11.5, fontWeight: 700, color: PALETTE.mute }}>
-          <Icon name="calendar" size={13} style={{ color: PALETTE.blue }} /> Pulang
-        </span>
-        <span style={{ fontSize: 13.5, color: PALETTE.ink, fontWeight: 600 }}>Tambah tanggal</span>
-      </div>
-      <div style={{ width: 1, background: PALETTE.line, margin: "8px 0" }} className="fd-search-divider" />
-      <div style={fieldStyle} className="fd-search-field">
-        <span style={{ ...iconWrap, fontSize: 11.5, fontWeight: 700, color: PALETTE.mute }}>
-          <Icon name="users" size={13} style={{ color: PALETTE.blue }} /> Peserta
-        </span>
-        <span style={{ fontSize: 13.5, color: PALETTE.ink, fontWeight: 600 }}>2 orang</span>
-      </div>
-      <button
-        onClick={() => setPage("booking")}
-        aria-label="Cari"
+    <FadeUp>
+      <div
         style={{
-          background: PALETTE.blue,
-          border: "none",
-          borderRadius: "50%",
-          width: 46,
-          height: 46,
-          flexShrink: 0,
-          margin: 4,
+          background: "#fff",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
+          border: `1px solid ${P.border}`,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          color: "#fff",
+          alignItems: "stretch",
+          padding: "8px",
+          gap: 0,
+          flexWrap: "wrap",
         }}
+        className="fd-search-bar"
       >
-        <Icon name="route" size={19} />
-      </button>
-      <style>{`
-        .fd-search-bar { border-radius: 999px; }
-        @media (max-width: 720px) {
-          .fd-search-divider { display: none; }
-          .fd-search-bar { border-radius: 24px; justify-content: center; padding: 12px; gap: 12px; }
-          .fd-search-field { min-width: 100% !important; padding: 8px 12px !important; }
-        }
-      `}</style>
-    </div>
+        <div style={fieldStyle} className="fd-search-field">
+          <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, color: P.textLight, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <Icon name="pin" size={13} style={{ color: P.primary }} /> Lokasi
+          </span>
+          <span style={{ fontSize: 14, color: P.dark, fontWeight: 600 }}>Cari destinasi</span>
+        </div>
+        <div style={{ width: 1, background: P.border, margin: "10px 0" }} className="fd-search-divider" />
+        <div style={fieldStyle} className="fd-search-field">
+          <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, color: P.textLight, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <Icon name="calendar" size={13} style={{ color: P.primary }} /> Tanggal
+          </span>
+          <span style={{ fontSize: 14, color: P.dark, fontWeight: 600 }}>Pilih tanggal</span>
+        </div>
+        <div style={{ width: 1, background: P.border, margin: "10px 0" }} className="fd-search-divider" />
+        <div style={fieldStyle} className="fd-search-field">
+          <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, color: P.textLight, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <Icon name="users" size={13} style={{ color: P.primary }} /> Tamu
+          </span>
+          <span style={{ fontSize: 14, color: P.dark, fontWeight: 600 }}>2 orang</span>
+        </div>
+        <button
+          onClick={() => setPage("booking")}
+          aria-label="Cari"
+          style={{
+            background: `linear-gradient(135deg, ${P.primary}, ${P.primaryDark})`,
+            border: "none",
+            borderRadius: 999,
+            padding: "12px 28px",
+            flexShrink: 0,
+            margin: 4,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            color: "#fff",
+            gap: 8,
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600,
+            fontSize: 14,
+            boxShadow: "0 4px 14px rgba(37,99,235,0.3)",
+            transition: "all 0.2s ease",
+          }}
+        >
+          <Icon name="search" size={16} /> Search
+        </button>
+        <style>{`
+          .fd-search-bar { border-radius: 999px; }
+          @media (max-width: 720px) {
+            .fd-search-divider { display: none; }
+            .fd-search-bar { border-radius: 24px; justify-content: center; padding: 14px; gap: 12px; }
+            .fd-search-field { min-width: 100% !important; padding: 10px 14px !important; }
+          }
+        `}</style>
+      </div>
+    </FadeUp>
   );
 }
 
+/* ─── Home Page ─── */
 function HomePage({ setPage, goToBooking }) {
   return (
     <>
+      {/* Hero */}
       <section
         style={{
           position: "relative",
-          overflow: "visible",
-          background: PALETTE.page,
-          padding: "44px 28px 0",
+          overflow: "hidden",
+          background: P.bgPage,
+          padding: "100px 32px 0",
         }}
       >
         <div
           style={{
-            maxWidth: 1160,
+            maxWidth: 1200,
             margin: "0 auto",
-            background: PALETTE.blueTint,
-            borderRadius: 32,
-            padding: "48px 40px 90px",
             display: "grid",
-            gridTemplateColumns: "1fr 1.05fr",
-            gap: 36,
+            gridTemplateColumns: "1fr 1.1fr",
+            gap: 48,
             alignItems: "center",
-            position: "relative",
+            minHeight: "80vh",
           }}
           className="fd-hero-grid"
         >
-          <div>
-            <Eyebrow>Jelajahi. Impikan. Rasakan.</Eyebrow>
-            <h1
-              style={{
-                fontFamily: "'Fraunces', serif",
-                fontWeight: 600,
-                fontSize: "clamp(32px, 4.6vw, 50px)",
-                lineHeight: 1.1,
-                color: PALETTE.deep,
-                margin: "0 0 18px",
-              }}
-            >
-              Dunia ini <span style={{ fontStyle: "italic", color: PALETTE.blue }}>milikmu.</span>
-            </h1>
-            <p style={{ color: PALETTE.mute, fontSize: 15.5, lineHeight: 1.7, maxWidth: 400, margin: "0 0 28px" }}>
-              Temukan destinasi terbaik di nusantara, hal seru untuk dilakukan, dan pengalaman tak terlupakan
-              bersama FADTOUR.
-            </p>
-            <button
-              onClick={() => setPage("packages")}
-              style={{
-                background: PALETTE.blue,
-                color: "#fff",
-                border: "none",
-                borderRadius: 999,
-                padding: "13px 26px",
-                fontWeight: 700,
-                fontSize: 14.5,
-                cursor: "pointer",
-                fontFamily: "'Manrope', sans-serif",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              Mulai Jelajah <Icon name="arrow" size={16} />
-            </button>
-
-            <div style={{ display: "flex", gap: 30, marginTop: 40, flexWrap: "wrap" }}>
-              {[
-                ["120+", "Destinasi"],
-                ["8.6k", "Wisatawan"],
-                ["4.8", "Rating"],
-              ].map(([n, l]) => (
-                <div key={l}>
-                  <div style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: PALETTE.deep, fontWeight: 600 }}>
-                    {n}
-                  </div>
-                  <div style={{ fontSize: 12, color: PALETTE.mute }}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ position: "relative" }}>
-            <div
-              style={{
-                borderRadius: 26,
-                overflow: "hidden",
-                height: 360,
-                backgroundImage: `url(${photo("santorini sunset coast", 900, 700)})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 18,
-                right: -14,
-                background: "#fff",
-                borderRadius: 16,
-                padding: "10px 14px",
-                boxShadow: "0 12px 28px rgba(20,40,90,0.16)",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}
-              className="fd-hero-badge"
-            >
-              <div
+          <FadeUp>
+            <div>
+              <p
                 style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: "50%",
-                  background: PALETTE.blueTint,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: PALETTE.blue,
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: P.primary,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  marginBottom: 16,
                 }}
               >
-                <Icon name="users" size={16} />
+                Jelajahi Indonesia
+              </p>
+              <h1
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontWeight: 700,
+                  fontSize: "clamp(36px, 5vw, 56px)",
+                  lineHeight: 1.1,
+                  color: P.dark,
+                  margin: "0 0 22px",
+                }}
+              >
+                Kunjungi Tempat{" "}
+                <span style={{ color: P.primary, fontStyle: "italic" }}>Terindah</span> di
+                Indonesia
+              </h1>
+              <p
+                style={{
+                  color: P.textLight,
+                  fontSize: 16,
+                  lineHeight: 1.75,
+                  maxWidth: 440,
+                  margin: "0 0 32px",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Rencanakan perjalanan impianmu bersama pemandu profesional. Temukan destinasi
+                terbaik, pengalaman otentik, dan kenangan tak terlupakan.
+              </p>
+              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                <button
+                  onClick={() => setPage("packages")}
+                  style={{
+                    background: `linear-gradient(135deg, ${P.primary}, ${P.primaryDark})`,
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 999,
+                    padding: "14px 32px",
+                    fontWeight: 600,
+                    fontSize: 15,
+                    cursor: "pointer",
+                    fontFamily: "'Inter', sans-serif",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    boxShadow: "0 4px 14px rgba(37,99,235,0.3)",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Mulai Jelajah <Icon name="arrow" size={16} />
+                </button>
+                <button
+                  onClick={() => setPage("about")}
+                  style={{
+                    background: "none",
+                    color: P.dark,
+                    border: `2px solid ${P.border}`,
+                    borderRadius: 999,
+                    padding: "14px 28px",
+                    fontWeight: 600,
+                    fontSize: 15,
+                    cursor: "pointer",
+                    fontFamily: "'Inter', sans-serif",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Tentang Kami
+                </button>
               </div>
-              <div>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: PALETTE.deep }}>Wisatawan senang</div>
-                <div style={{ fontSize: 11, color: PALETTE.mute }}>+2.1k bulan ini</div>
+
+              <div style={{ display: "flex", gap: 36, marginTop: 48, flexWrap: "wrap" }}>
+                {[
+                  ["120+", "Destinasi"],
+                  ["8.6k", "Wisatawan"],
+                  ["4.8", "Rating"],
+                ].map(([n, l]) => (
+                  <div key={l}>
+                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: P.primary, fontWeight: 700 }}>
+                      {n}
+                    </div>
+                    <div style={{ fontSize: 13, color: P.textLight, fontFamily: "'Inter', sans-serif" }}>{l}</div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          </FadeUp>
+
+          {/* Image Grid / Mosaic */}
+          <FadeUp>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gridTemplateRows: "repeat(3, 120px)",
+                gap: 12,
+              }}
+              className="fd-hero-mosaic"
+            >
+              <div style={{ gridColumn: "1 / 3", gridRow: "1 / 3", borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("santorini greek island sunset", 800, 600)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("bali rice terrace indonesia", 400, 400)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("komodo island boat indonesia", 400, 400)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("indonesian beach sunset palm", 400, 300)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("borobudur temple indonesia sunrise", 400, 300)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+              <div style={{ borderRadius: 20, overflow: "hidden", backgroundImage: `url(${photo("lake toba north sumatra", 400, 300)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+            </div>
+          </FadeUp>
         </div>
 
+        {/* Search Bar */}
         <div
           style={{
-            maxWidth: 980,
-            margin: "0 auto",
-            padding: "0 28px",
+            maxWidth: 1000,
+            margin: "-20px auto 0",
+            padding: "0 32px 60px",
             position: "relative",
-            top: -34,
+            zIndex: 5,
           }}
         >
           <SearchBar setPage={setPage} />
@@ -722,208 +877,289 @@ function HomePage({ setPage, goToBooking }) {
 
         <style>{`
           @media (max-width: 860px) {
-            .fd-hero-grid { grid-template-columns: 1fr !important; padding-bottom: 40px !important; }
-            .fd-hero-badge { display: none !important; }
+            .fd-hero-grid { grid-template-columns: 1fr !important; }
+            .fd-hero-mosaic { grid-template-rows: repeat(3, 100px) !important; }
           }
         `}</style>
       </section>
 
-      <section style={{ padding: "34px 28px 70px", maxWidth: 1160, margin: "0 auto" }}>
+      {/* Categories */}
+      <section style={{ padding: "70px 32px", maxWidth: 1200, margin: "0 auto" }}>
+        <SectionTitle sub="Temukan berbagai pilihan destinasi sesuai minat dan gaya petualanganmu.">Kategori</SectionTitle>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "0.62fr 1.38fr",
-            gap: 22,
-            alignItems: "stretch",
+            gridTemplateColumns: "repeat(6, 1fr)",
+            gap: 24,
           }}
-          className="fd-featured-grid"
+          className="fd-cat-grid"
         >
-          <div
-            style={{
-              borderRadius: 20,
-              background: `linear-gradient(150deg, ${PALETTE.blueDeep}, ${PALETTE.blue})`,
-              padding: 26,
-              color: "#fff",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: 220,
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.8 }}>
-                Penawaran terbatas
+          {CATEGORIES.map((c) => (
+            <FadeUp key={c.label}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                <div
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: "50%",
+                    backgroundImage: `url(${photo(c.img, 300, 300)})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    border: `3px solid ${P.border}`,
+                    transition: "transform 0.3s ease, border-color 0.3s ease",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                  }}
+                  className="fd-cat-circle"
+                />
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: P.dark, fontFamily: "'Inter', sans-serif" }}>
+                  {c.label}
+                </span>
               </div>
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, margin: "10px 0 0", lineHeight: 1.2 }}>
-                Diskon hingga 30% untuk destinasi pilihan
-              </h3>
-            </div>
-            <button
-              onClick={() => setPage("packages")}
-              style={{
-                marginTop: 20,
-                alignSelf: "flex-start",
-                background: "#fff",
-                color: PALETTE.blueDeep,
-                border: "none",
-                borderRadius: 999,
-                padding: "10px 20px",
-                fontWeight: 700,
-                fontSize: 13.5,
-                cursor: "pointer",
-                fontFamily: "'Manrope', sans-serif",
-              }}
-            >
-              Lihat penawaran
-            </button>
-          </div>
+            </FadeUp>
+          ))}
+        </div>
+        <style>{`
+          .fd-cat-circle:hover { transform: scale(1.08); border-color: ${P.primary} !important; }
+          @media (max-width: 700px) {
+            .fd-cat-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; }
+          }
+        `}</style>
+      </section>
 
-          <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, color: PALETTE.deep, margin: 0 }}>
-                Destinasi unggulan
+      {/* Popular Destinations */}
+      <section style={{ padding: "40px 32px 80px", maxWidth: 1200, margin: "0 auto" }}>
+        <SectionTitle sub="Enam destinasi terfavorit pilihan wisatawan FADTOUR sepanjang tahun.">
+          Destinasi Populer
+        </SectionTitle>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 24,
+          }}
+          className="fd-grid-3"
+        >
+          {DESTINATIONS.slice(0, 3).map((d) => (
+            <DestinationCard key={d.id} d={d} onSelect={goToBooking} />
+          ))}
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section style={{ background: P.bgSoft, padding: "80px 32px" }}>
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 60,
+            alignItems: "center",
+          }}
+          className="fd-hero-grid-about"
+        >
+          <FadeUp>
+            <div>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(26px, 3.5vw, 36px)", fontWeight: 700, color: P.dark, margin: "0 0 32px" }}>
+                Layanan Kami
               </h2>
-              <button
-                onClick={() => setPage("packages")}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: PALETTE.blue,
-                  fontWeight: 700,
-                  fontSize: 13,
-                  cursor: "pointer",
-                  fontFamily: "'Manrope', sans-serif",
-                }}
-              >
-                Lihat semua
-              </button>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="fd-featured-cards">
-              {DESTINATIONS.slice(0, 3).map((d) => (
-                <div key={d.id} onClick={() => goToBooking(d)} style={{ cursor: "pointer" }}>
+              {[
+                { icon: "car", title: "Sewa Kendaraan", desc: "Transportasi nyaman dan aman ke seluruh destinasi, mulai dari kendaraan pribadi hingga bus wisata." },
+                { icon: "hotel", title: "Booking Hotel", desc: "Akomodasi terbaik di setiap destinasi, dari homestay lokal hingga resort bintang lima." },
+                { icon: "anchor", title: "Pemandu Lokal", desc: "Pemandu berpengalaman yang lahir dan besar di destinasi tujuanmu, untuk pengalaman yang otentik." },
+              ].map((s) => (
+                <div
+                  key={s.title}
+                  style={{
+                    display: "flex",
+                    gap: 18,
+                    marginBottom: 28,
+                    alignItems: "flex-start",
+                  }}
+                >
                   <div
                     style={{
-                      height: 100,
+                      width: 48,
+                      height: 48,
                       borderRadius: 14,
-                      backgroundImage: `url(${photo(d.img, 400, 300)})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      marginBottom: 8,
+                      background: P.primaryLight,
+                      color: P.primary,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
                     }}
-                  />
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: PALETTE.deep }}>{d.name}</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: PALETTE.mute }}>
-                    <span>Mulai {d.price}</span>
-                    <span style={{ color: PALETTE.gold, fontWeight: 700 }}>★ {d.rating}</span>
+                  >
+                    <Icon name={s.icon} size={22} />
+                  </div>
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: 17,
+                        fontWeight: 700,
+                        color: P.dark,
+                        margin: "0 0 6px",
+                      }}
+                    >
+                      {s.title}
+                    </h3>
+                    <p style={{ fontSize: 13.5, color: P.textLight, lineHeight: 1.65, margin: 0, fontFamily: "'Inter', sans-serif" }}>{s.desc}</p>
+                    <button
+                      onClick={() => setPage("booking")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: P.primary,
+                        fontWeight: 600,
+                        fontSize: 13,
+                        cursor: "pointer",
+                        padding: 0,
+                        marginTop: 8,
+                        fontFamily: "'Inter', sans-serif",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      Explore more <Icon name="arrow" size={13} />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </FadeUp>
+          <FadeUp>
+            <div
+              style={{
+                borderRadius: 28,
+                overflow: "hidden",
+                height: 420,
+                backgroundImage: `url(${photo("tropical paradise island boat indonesia", 800, 600)})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+              }}
+            />
+          </FadeUp>
         </div>
         <style>{`
           @media (max-width: 860px) {
-            .fd-featured-grid { grid-template-columns: 1fr !important; }
-            .fd-featured-cards { grid-template-columns: 1fr 1fr !important; }
-          }
-          @media (max-width: 480px) {
-            .fd-featured-cards { grid-template-columns: 1fr !important; }
+            .fd-hero-grid-about { grid-template-columns: 1fr !important; }
           }
         `}</style>
       </section>
 
-      <section style={{ background: "#fff", padding: "70px 28px", borderTop: `1px solid ${PALETTE.line}` }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-          <Eyebrow>Kenapa fadtour</Eyebrow>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 32, color: PALETTE.deep, margin: "0 0 34px", maxWidth: 520 }}>
-            Kami urus logistiknya, kamu nikmati perjalanannya.
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }} className="fd-grid-3">
-            {[
-              ["anchor", "Pemandu lokal", "Setiap trip didampingi pemandu yang lahir dan besar di destinasi tersebut."],
-              ["calendar", "Itinerary fleksibel", "Ubah tanggal atau rute kapan saja hingga H-7 tanpa biaya tambahan."],
-              ["users", "Grup kecil", "Maksimal 12 orang per grup supaya perjalanan tetap personal dan nyaman."],
-            ].map(([icon, title, desc]) => (
-              <div key={title} style={{ background: PALETTE.blueTint, borderRadius: 16, padding: 24 }}>
-                <div
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 12,
-                    background: PALETTE.blue,
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 16,
-                  }}
-                >
-                  <Icon name={icon} size={20} />
-                </div>
-                <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, color: PALETTE.deep, margin: "0 0 8px" }}>
-                  {title}
-                </h3>
-                <p style={{ fontSize: 13.5, color: PALETTE.mute, lineHeight: 1.6, margin: 0 }}>{desc}</p>
-              </div>
-            ))}
+      {/* Client Review */}
+      <section style={{ padding: "80px 32px", maxWidth: 900, margin: "0 auto" }}>
+        <SectionTitle sub="Dengarkan pengalaman langsung dari para wisatawan yang telah menjelajah bersama kami.">
+          Ulasan Wisatawan
+        </SectionTitle>
+        <FadeUp>
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 28,
+              padding: "40px 48px",
+              textAlign: "center",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.06)",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: "50%",
+                background: P.primaryLight,
+                color: P.primary,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 24px",
+              }}
+            >
+              <Icon name="quote" size={28} />
+            </div>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: "clamp(18px, 2.5vw, 24px)",
+                color: P.dark,
+                lineHeight: 1.6,
+                margin: "0 0 28px",
+              }}
+            >
+              "Perjalanan ke Labuan Bajo bersama FADTOUR terasa seperti dipandu teman lama yang
+              kebetulan tahu semua tempat terbaik."
+            </p>
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: "50%",
+                margin: "0 auto 12px",
+                backgroundImage: `url(${photo("smiling indonesian woman portrait", 200, 200)})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                border: `3px solid ${P.primaryLight}`,
+              }}
+            />
+            <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 15, color: P.dark }}>
+              Nadia Rahmawati
+            </div>
+            <div style={{ fontSize: 13, color: P.textLight, fontFamily: "'Inter', sans-serif" }}>
+              Wisatawan Jakarta
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section style={{ padding: "70px 28px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            margin: "0 auto 18px",
-            backgroundImage: `url(${photo("smiling woman portrait", 200, 200)})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            border: `2px solid ${PALETTE.blueTint}`,
-          }}
-        />
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontStyle: "italic", fontSize: 26, color: PALETTE.deep, lineHeight: 1.5, margin: "0 0 20px" }}>
-          "Perjalanan ke Labuan Bajo bersama FADTOUR terasa seperti dipandu teman lama yang kebetulan tahu semua
-          tempat terbaik."
-        </h2>
-        <div style={{ fontSize: 13.5, color: PALETTE.mute, fontFamily: "'Manrope', sans-serif", fontWeight: 600 }}>
-          — Nadia R., wisatawan Jakarta
-        </div>
+        </FadeUp>
       </section>
 
       <style>{`
         @media (max-width: 860px) {
           .fd-grid-3 { grid-template-columns: 1fr !important; }
         }
+        .fd-dest-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+        }
       `}</style>
     </>
   );
 }
 
+/* ─── About Page ─── */
 function AboutPage() {
   return (
-    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "60px 28px 90px" }}>
-      <Eyebrow>Tentang kami</Eyebrow>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(30px, 4vw, 44px)", color: PALETTE.deep, margin: "0 0 20px", maxWidth: 640 }}>
-        Dari kantor kecil di Gresik, menuju setiap sudut nusantara.
-      </h1>
-      <p style={{ fontSize: 15.5, color: PALETTE.mute, lineHeight: 1.8, maxWidth: 640, marginBottom: 32 }}>
-        FADTOUR berdiri dari kecintaan pada perjalanan darat dan laut Indonesia. Kami percaya setiap daerah punya
-        keunikan yang layak dialami langsung, bukan sekadar dilihat dari jauh — karena itu setiap paket kami
-        disusun bersama pemandu dan komunitas lokal di destinasi masing-masing.
-      </p>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "120px 32px 90px" }}>
+      <FadeUp>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 700, color: P.primary, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
+          Tentang Kami
+        </p>
+        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 44px)", color: P.dark, margin: "0 0 20px", maxWidth: 640, fontWeight: 700 }}>
+          Dari kantor kecil di Gresik, menuju setiap sudut nusantara.
+        </h1>
+        <p style={{ fontSize: 16, color: P.textLight, lineHeight: 1.8, maxWidth: 640, marginBottom: 36, fontFamily: "'Inter', sans-serif" }}>
+          FADTOUR berdiri dari kecintaan pada perjalanan darat dan laut Indonesia. Kami percaya setiap daerah punya
+          keunikan yang layak dialami langsung, bukan sekadar dilihat dari jauh — karena itu setiap paket kami
+          disusun bersama pemandu dan komunitas lokal di destinasi masing-masing.
+        </p>
+      </FadeUp>
 
-      <div
-        style={{
-          height: 280,
-          borderRadius: 24,
-          marginBottom: 40,
-          backgroundImage: `url(${photo("indonesia travel guide group", 1200, 500)})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+      <FadeUp>
+        <div
+          style={{
+            height: 300,
+            borderRadius: 28,
+            marginBottom: 48,
+            backgroundImage: `url(${photo("indonesia travel guide group adventure", 1200, 500)})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.08)",
+          }}
+        />
+      </FadeUp>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginBottom: 56 }} className="fd-grid-3">
         {[
@@ -931,36 +1167,44 @@ function AboutPage() {
           ["120+", "Destinasi dikelola"],
           ["35", "Pemandu lokal mitra"],
         ].map(([n, l]) => (
-          <div key={l} style={{ background: PALETTE.blueTint, borderRadius: 16, padding: "26px 22px" }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 30, color: PALETTE.blue, fontWeight: 600 }}>{n}</div>
-            <div style={{ fontSize: 13, color: PALETTE.mute, marginTop: 4 }}>{l}</div>
-          </div>
+          <FadeUp key={l}>
+            <div style={{ background: P.primaryLight, borderRadius: 20, padding: "28px 24px" }}>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, color: P.primary, fontWeight: 700 }}>{n}</div>
+              <div style={{ fontSize: 13.5, color: P.textLight, marginTop: 6, fontFamily: "'Inter', sans-serif" }}>{l}</div>
+            </div>
+          </FadeUp>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }} className="fd-hero-grid-about">
-        <div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: PALETTE.deep, margin: "0 0 14px" }}>Misi kami</h2>
-          <p style={{ fontSize: 14.5, color: PALETTE.mute, lineHeight: 1.75 }}>
-            Membuka akses wisata yang bertanggung jawab ke daerah-daerah yang sering terlewat oleh jalur turis
-            biasa, sambil memastikan pendapatan wisata dirasakan langsung oleh komunitas setempat.
-          </p>
-        </div>
-        <div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: PALETTE.deep, margin: "0 0 14px" }}>Cara kami bekerja</h2>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-            {[
-              "Survei langsung setiap rute sebelum dijual ke publik",
-              "Kerja sama jangka panjang dengan pemandu dan penginapan lokal",
-              "Grup kecil untuk menjaga kualitas dan kenyamanan",
-            ].map((t) => (
-              <li key={t} style={{ display: "flex", gap: 10, fontSize: 14, color: PALETTE.ink }}>
-                <Icon name="check" size={16} style={{ color: PALETTE.coral, flexShrink: 0, marginTop: 3 }} />
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }} className="fd-hero-grid-about">
+        <FadeUp>
+          <div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, color: P.dark, margin: "0 0 16px", fontWeight: 700 }}>Misi kami</h2>
+            <p style={{ fontSize: 15, color: P.textLight, lineHeight: 1.8, fontFamily: "'Inter', sans-serif" }}>
+              Membuka akses wisata yang bertanggung jawab ke daerah-daerah yang sering terlewat oleh jalur turis
+              biasa, sambil memastikan pendapatan wisata dirasakan langsung oleh komunitas setempat.
+            </p>
+          </div>
+        </FadeUp>
+        <FadeUp>
+          <div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, color: P.dark, margin: "0 0 16px", fontWeight: 700 }}>Cara kami bekerja</h2>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+              {[
+                "Survei langsung setiap rute sebelum dijual ke publik",
+                "Kerja sama jangka panjang dengan pemandu dan penginapan lokal",
+                "Grup kecil untuk menjaga kualitas dan kenyamanan",
+              ].map((t) => (
+                <li key={t} style={{ display: "flex", gap: 12, fontSize: 14.5, color: P.text, fontFamily: "'Inter', sans-serif" }}>
+                  <span style={{ width: 22, height: 22, borderRadius: "50%", background: P.primaryLight, color: P.primary, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                    <Icon name="check" size={12} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </FadeUp>
       </div>
       <style>{`
         @media (max-width: 700px) {
@@ -972,18 +1216,14 @@ function AboutPage() {
   );
 }
 
+/* ─── Packages Page ─── */
 function PackagesPage({ goToBooking }) {
   return (
-    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "60px 28px 90px" }}>
-      <Eyebrow>Paket wisata</Eyebrow>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(28px, 4vw, 40px)", color: PALETTE.deep, margin: "0 0 12px" }}>
-        Enam rute favorit tamu FADTOUR.
-      </h1>
-      <p style={{ fontSize: 14.5, color: PALETTE.mute, maxWidth: 560, marginBottom: 36 }}>
-        Semua harga sudah termasuk akomodasi, transportasi lokal, dan pemandu. Tinggal pilih rute, sesuaikan
-        tanggal di halaman booking.
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 22 }} className="fd-grid-3">
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "120px 32px 90px" }}>
+      <SectionTitle sub="Semua harga sudah termasuk akomodasi, transportasi lokal, dan pemandu. Tinggal pilih rute, sesuaikan tanggal di halaman booking.">
+        Paket Wisata
+      </SectionTitle>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }} className="fd-grid-3">
         {DESTINATIONS.map((d) => (
           <DestinationCard key={d.id} d={d} onSelect={goToBooking} />
         ))}
@@ -997,6 +1237,7 @@ function PackagesPage({ goToBooking }) {
   );
 }
 
+/* ─── Booking Page ─── */
 function BookingPage({ presetDestination }) {
   const [form, setForm] = useState({
     destination: presetDestination || "",
@@ -1018,139 +1259,151 @@ function BookingPage({ presetDestination }) {
   const inputStyle = {
     width: "100%",
     boxSizing: "border-box",
-    padding: "12px 14px",
-    borderRadius: 10,
-    border: `1px solid ${PALETTE.line}`,
-    fontSize: 14.5,
-    fontFamily: "'Manrope', sans-serif",
-    color: PALETTE.ink,
+    padding: "14px 16px",
+    borderRadius: 14,
+    border: `1px solid ${P.border}`,
+    fontSize: 15,
+    fontFamily: "'Inter', sans-serif",
+    color: P.dark,
     background: "#fff",
+    transition: "border-color 0.2s ease",
+    outline: "none",
   };
   const labelStyle = {
-    fontSize: 12.5,
+    fontSize: 13,
     fontWeight: 700,
-    color: PALETTE.deep,
-    marginBottom: 6,
+    color: P.dark,
+    marginBottom: 8,
     display: "block",
-    fontFamily: "'Manrope', sans-serif",
+    fontFamily: "'Inter', sans-serif",
   };
 
   return (
-    <div style={{ maxWidth: 780, margin: "0 auto", padding: "60px 28px 90px" }}>
-      <Eyebrow>Booking</Eyebrow>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(28px, 4vw, 38px)", color: PALETTE.deep, margin: "0 0 12px" }}>
-        Rencanakan perjalananmu.
-      </h1>
-      <p style={{ fontSize: 14.5, color: PALETTE.mute, marginBottom: 32 }}>
-        Isi detail di bawah, tim kami akan menghubungimu dalam 1x24 jam untuk konfirmasi ketersediaan dan
-        pembayaran.
-      </p>
+    <div style={{ maxWidth: 780, margin: "0 auto", padding: "120px 32px 90px" }}>
+      <FadeUp>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 700, color: P.primary, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>
+          Booking
+        </p>
+        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 4vw, 38px)", color: P.dark, margin: "0 0 12px", fontWeight: 700 }}>
+          Rencanakan perjalananmu.
+        </h1>
+        <p style={{ fontSize: 15, color: P.textLight, marginBottom: 36, fontFamily: "'Inter', sans-serif", lineHeight: 1.7 }}>
+          Isi detail di bawah, tim kami akan menghubungimu dalam 1x24 jam untuk konfirmasi ketersediaan dan
+          pembayaran.
+        </p>
+      </FadeUp>
 
-      {submitted ? (
-        <div
-          style={{
-            background: PALETTE.sandDeep,
-            borderRadius: 16,
-            padding: 32,
-            textAlign: "center",
-          }}
-        >
-          <Icon name="check" size={30} style={{ color: PALETTE.coral, marginBottom: 12 }} />
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, color: PALETTE.deep, margin: "0 0 8px" }}>
-            Permintaan booking terkirim
-          </h2>
-          <p style={{ fontSize: 14, color: PALETTE.mute, margin: 0 }}>
-            Terima kasih, {form.name || "calon petualang"}. Kami akan menghubungi lewat kontak yang kamu berikan
-            untuk paket {form.destination || "pilihanmu"}.
-          </p>
-          <button
-            onClick={() => setSubmitted(false)}
+      <FadeUp>
+        {submitted ? (
+          <div
             style={{
-              marginTop: 20,
-              background: "none",
-              border: `1px solid ${PALETTE.line}`,
-              borderRadius: 999,
-              padding: "10px 20px",
-              fontWeight: 700,
-              fontSize: 13.5,
-              color: PALETTE.deep,
-              cursor: "pointer",
-              fontFamily: "'Manrope', sans-serif",
+              background: P.primaryLight,
+              borderRadius: 24,
+              padding: 40,
+              textAlign: "center",
             }}
           >
-            Ajukan booking lain
-          </button>
-        </div>
-      ) : (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSubmitted(true);
-          }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 18,
-            background: "#fff",
-            border: `1px solid ${PALETTE.line}`,
-            borderRadius: 18,
-            padding: 28,
-          }}
-        >
-          <div>
-            <label style={labelStyle}>Destinasi</label>
-            <select style={inputStyle} value={form.destination} onChange={set("destination")} required>
-              <option value="" disabled>
-                Pilih destinasi
-              </option>
-              {DESTINATIONS.map((d) => (
-                <option key={d.id} value={d.name}>
-                  {d.name} — {d.price}
+            <div style={{ width: 60, height: 60, borderRadius: "50%", background: "#D1FAE5", color: P.success, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+              <Icon name="check" size={28} />
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: P.dark, margin: "0 0 10px", fontWeight: 700 }}>
+              Permintaan booking terkirim
+            </h2>
+            <p style={{ fontSize: 14.5, color: P.textLight, margin: "0 0 20px", fontFamily: "'Inter', sans-serif" }}>
+              Terima kasih, {form.name || "calon petualang"}. Kami akan menghubungi lewat kontak yang kamu berikan
+              untuk paket {form.destination || "pilihanmu"}.
+            </p>
+            <button
+              onClick={() => setSubmitted(false)}
+              style={{
+                background: "none",
+                border: `2px solid ${P.border}`,
+                borderRadius: 999,
+                padding: "12px 24px",
+                fontWeight: 600,
+                fontSize: 14,
+                color: P.dark,
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              Ajukan booking lain
+            </button>
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSubmitted(true);
+            }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 20,
+              background: "#fff",
+              border: `1px solid ${P.border}`,
+              borderRadius: 24,
+              padding: 36,
+              boxShadow: "0 4px 24px rgba(0,0,0,0.04)",
+            }}
+          >
+            <div>
+              <label style={labelStyle}>Destinasi</label>
+              <select style={{ ...inputStyle, cursor: "pointer" }} value={form.destination} onChange={set("destination")} required>
+                <option value="" disabled>
+                  Pilih destinasi
                 </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label style={labelStyle}>Nama lengkap</label>
-            <input style={inputStyle} value={form.name} onChange={set("name")} placeholder="Nama sesuai KTP" required />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }} className="fd-form-grid">
-            <div>
-              <label style={labelStyle}>Tanggal berangkat</label>
-              <input type="date" style={inputStyle} value={form.date} onChange={set("date")} required />
+                {DESTINATIONS.map((d) => (
+                  <option key={d.id} value={d.name}>
+                    {d.name} — {d.price}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
-              <label style={labelStyle}>Jumlah peserta</label>
-              <input type="number" min="1" max="12" style={inputStyle} value={form.guests} onChange={set("guests")} />
+              <label style={labelStyle}>Nama lengkap</label>
+              <input style={inputStyle} value={form.name} onChange={set("name")} placeholder="Nama sesuai KTP" required />
             </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Catatan tambahan</label>
-            <textarea
-              style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
-              value={form.notes}
-              onChange={set("notes")}
-              placeholder="Preferensi kamar, kebutuhan khusus, dll (opsional)"
-            />
-          </div>
-          <button
-            type="submit"
-            style={{
-              background: PALETTE.coral,
-              color: "#fff",
-              border: "none",
-              borderRadius: 999,
-              padding: "13px 0",
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: "pointer",
-              fontFamily: "'Manrope', sans-serif",
-            }}
-          >
-            Kirim Permintaan Booking
-          </button>
-        </form>
-      )}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }} className="fd-form-grid">
+              <div>
+                <label style={labelStyle}>Tanggal berangkat</label>
+                <input type="date" style={inputStyle} value={form.date} onChange={set("date")} required />
+              </div>
+              <div>
+                <label style={labelStyle}>Jumlah peserta</label>
+                <input type="number" min="1" max="12" style={inputStyle} value={form.guests} onChange={set("guests")} />
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Catatan tambahan</label>
+              <textarea
+                style={{ ...inputStyle, minHeight: 100, resize: "vertical" }}
+                value={form.notes}
+                onChange={set("notes")}
+                placeholder="Preferensi kamar, kebutuhan khusus, dll (opsional)"
+              />
+            </div>
+            <button
+              type="submit"
+              style={{
+                background: `linear-gradient(135deg, ${P.primary}, ${P.primaryDark})`,
+                color: "#fff",
+                border: "none",
+                borderRadius: 999,
+                padding: "15px 0",
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+                boxShadow: "0 4px 14px rgba(37,99,235,0.3)",
+                transition: "all 0.2s ease",
+              }}
+            >
+              Kirim Permintaan Booking
+            </button>
+          </form>
+        )}
+      </FadeUp>
       <style>{`
         @media (max-width: 560px) {
           .fd-form-grid { grid-template-columns: 1fr !important; }
@@ -1160,140 +1413,149 @@ function BookingPage({ presetDestination }) {
   );
 }
 
+/* ─── Contact Page ─── */
 function ContactPage() {
   const [sent, setSent] = useState(false);
   const inputStyle = {
     width: "100%",
     boxSizing: "border-box",
-    padding: "12px 14px",
-    borderRadius: 10,
-    border: `1px solid ${PALETTE.line}`,
-    fontSize: 14.5,
-    fontFamily: "'Manrope', sans-serif",
+    padding: "14px 16px",
+    borderRadius: 14,
+    border: `1px solid ${P.border}`,
+    fontSize: 15,
+    fontFamily: "'Inter', sans-serif",
     background: "#fff",
-    color: PALETTE.ink,
+    color: P.dark,
+    outline: "none",
+    transition: "border-color 0.2s ease",
   };
   const labelStyle = {
-    fontSize: 12.5,
+    fontSize: 13,
     fontWeight: 700,
-    color: PALETTE.deep,
-    marginBottom: 6,
+    color: P.dark,
+    marginBottom: 8,
     display: "block",
-    fontFamily: "'Manrope', sans-serif",
+    fontFamily: "'Inter', sans-serif",
   };
 
   return (
-    <div style={{ maxWidth: 1160, margin: "0 auto", padding: "60px 28px 90px" }}>
-      <Eyebrow>Kontak</Eyebrow>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(28px, 4vw, 40px)", color: PALETTE.deep, margin: "0 0 12px" }}>
-        Ada pertanyaan sebelum berangkat?
-      </h1>
-      <p style={{ fontSize: 14.5, color: PALETTE.mute, maxWidth: 560, marginBottom: 40 }}>
-        Tim FADTOUR siap membantu dari Senin sampai Sabtu, pukul 09.00–18.00 WIB.
-      </p>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "120px 32px 90px" }}>
+      <SectionTitle sub="Tim FADTOUR siap membantu dari Senin sampai Sabtu, pukul 09.00–18.00 WIB.">
+        Kontak
+      </SectionTitle>
 
-      <div style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: 40 }} className="fd-hero-grid-about">
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div
-            style={{
-              height: 160,
-              borderRadius: 18,
-              backgroundImage: `url(${photo("travel agency office desk", 700, 400)})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-          {[
-            ["mail", "Email", "halo@fadtour.id"],
-            ["phone", "Telepon / WhatsApp", "+62 812-3456-7890"],
-            ["pin", "Kantor", "Jl. Veteran No. 12, Gresik, Jawa Timur"],
-          ].map(([icon, label, val]) => (
-            <div key={label} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 10,
-                  background: PALETTE.blueTint,
-                  color: PALETTE.blue,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Icon name={icon} size={18} />
-              </div>
-              <div>
-                <div style={{ fontSize: 12.5, color: PALETTE.mute, fontWeight: 600 }}>{label}</div>
-                <div style={{ fontSize: 15, color: PALETTE.ink, fontFamily: "'Manrope', sans-serif" }}>{val}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {sent ? (
-          <div
-            style={{
-              background: PALETTE.sandDeep,
-              borderRadius: 16,
-              padding: 32,
-              textAlign: "center",
-              alignSelf: "start",
-            }}
-          >
-            <Icon name="check" size={28} style={{ color: PALETTE.coral, marginBottom: 10 }} />
-            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, color: PALETTE.deep, margin: "0 0 6px" }}>
-              Pesan terkirim
-            </h2>
-            <p style={{ fontSize: 13.5, color: PALETTE.mute, margin: 0 }}>Kami akan membalas secepatnya.</p>
-          </div>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSent(true);
-            }}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-              background: "#fff",
-              border: `1px solid ${PALETTE.line}`,
-              borderRadius: 18,
-              padding: 26,
-            }}
-          >
-            <div>
-              <label style={labelStyle}>Nama</label>
-              <input style={inputStyle} placeholder="Nama kamu" required />
-            </div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <input type="email" style={inputStyle} placeholder="nama@email.com" required />
-            </div>
-            <div>
-              <label style={labelStyle}>Pesan</label>
-              <textarea style={{ ...inputStyle, minHeight: 110, resize: "vertical" }} placeholder="Tulis pertanyaanmu di sini" required />
-            </div>
-            <button
-              type="submit"
+      <div style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: 48 }} className="fd-hero-grid-about">
+        <FadeUp>
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div
               style={{
-                background: PALETTE.deep,
-                color: PALETTE.sand,
-                border: "none",
-                borderRadius: 999,
-                padding: "13px 0",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: "pointer",
-                fontFamily: "'Manrope', sans-serif",
+                height: 180,
+                borderRadius: 24,
+                backgroundImage: `url(${photo("modern travel agency office", 700, 400)})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+              }}
+            />
+            {[
+              ["mail", "Email", "halo@fadtour.id"],
+              ["phone", "Telepon / WhatsApp", "+62 812-3456-7890"],
+              ["pin", "Kantor", "Jl. Veteran No. 12, Gresik, Jawa Timur"],
+            ].map(([icon, label, val]) => (
+              <div key={label} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 14,
+                    background: P.primaryLight,
+                    color: P.primary,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon name={icon} size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, color: P.textLight, fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>{label}</div>
+                  <div style={{ fontSize: 15, color: P.dark, fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>{val}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+
+        <FadeUp>
+          {sent ? (
+            <div
+              style={{
+                background: P.primaryLight,
+                borderRadius: 24,
+                padding: 40,
+                textAlign: "center",
+                alignSelf: "start",
               }}
             >
-              Kirim Pesan
-            </button>
-          </form>
-        )}
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#D1FAE5", color: P.success, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                <Icon name="check" size={26} />
+              </div>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: P.dark, margin: "0 0 8px", fontWeight: 700 }}>
+                Pesan terkirim
+              </h2>
+              <p style={{ fontSize: 14, color: P.textLight, margin: 0, fontFamily: "'Inter', sans-serif" }}>Kami akan membalas secepatnya.</p>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSent(true);
+              }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 18,
+                background: "#fff",
+                border: `1px solid ${P.border}`,
+                borderRadius: 24,
+                padding: 32,
+                boxShadow: "0 4px 24px rgba(0,0,0,0.04)",
+              }}
+            >
+              <div>
+                <label style={labelStyle}>Nama</label>
+                <input style={inputStyle} placeholder="Nama kamu" required />
+              </div>
+              <div>
+                <label style={labelStyle}>Email</label>
+                <input type="email" style={inputStyle} placeholder="nama@email.com" required />
+              </div>
+              <div>
+                <label style={labelStyle}>Pesan</label>
+                <textarea style={{ ...inputStyle, minHeight: 120, resize: "vertical" }} placeholder="Tulis pertanyaanmu di sini" required />
+              </div>
+              <button
+                type="submit"
+                style={{
+                  background: `linear-gradient(135deg, ${P.primary}, ${P.primaryDark})`,
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 999,
+                  padding: "15px 0",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: "pointer",
+                  fontFamily: "'Inter', sans-serif",
+                  boxShadow: "0 4px 14px rgba(37,99,235,0.3)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Kirim Pesan
+              </button>
+            </form>
+          )}
+        </FadeUp>
       </div>
       <style>{`
         @media (max-width: 700px) {
@@ -1304,39 +1566,42 @@ function ContactPage() {
   );
 }
 
+/* ─── Footer ─── */
 function Footer({ setPage }) {
   return (
-    <footer style={{ background: PALETTE.deep, padding: "48px 28px 28px", color: "#B7C8C8" }}>
+    <footer style={{ background: P.primaryDark, padding: "56px 32px 32px", color: "rgba(255,255,255,0.7)" }}>
       <div
         style={{
-          maxWidth: 1160,
+          maxWidth: 1200,
           margin: "0 auto",
           display: "flex",
           justifyContent: "space-between",
           flexWrap: "wrap",
-          gap: 32,
+          gap: 36,
         }}
       >
-        <div style={{ maxWidth: 300 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <Icon name="compass" size={18} style={{ color: PALETTE.gold }} />
-            <span style={{ fontFamily: "'Fraunces', serif", fontSize: 18, color: PALETTE.sand, fontWeight: 600 }}>
+        <div style={{ maxWidth: 320 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <span style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+              <Icon name="compass" size={16} />
+            </span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#fff", fontWeight: 700 }}>
               FADTOUR
             </span>
           </div>
-          <p style={{ fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+          <p style={{ fontSize: 13.5, lineHeight: 1.7, margin: 0, fontFamily: "'Inter', sans-serif" }}>
             Biro perjalanan wisata yang merancang trip ke seluruh penjuru Indonesia dengan pemandu lokal terpercaya.
           </p>
         </div>
-        <div style={{ display: "flex", gap: 56, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 60, flexWrap: "wrap" }}>
           <div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: PALETTE.sand, marginBottom: 12 }}>Navigasi</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: "#fff", marginBottom: 14, fontFamily: "'Inter', sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Navigasi</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {NAV.map((n) => (
                 <button
                   key={n.key}
                   onClick={() => setPage(n.key)}
-                  style={{ background: "none", border: "none", color: "#B7C8C8", fontSize: 13, textAlign: "left", cursor: "pointer", padding: 0 }}
+                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.7)", fontSize: 13.5, textAlign: "left", cursor: "pointer", padding: 0, fontFamily: "'Inter', sans-serif", transition: "color 0.2s" }}
                 >
                   {n.label}
                 </button>
@@ -1344,8 +1609,8 @@ function Footer({ setPage }) {
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: PALETTE.sand, marginBottom: 12 }}>Kontak</div>
-            <div style={{ fontSize: 13, lineHeight: 2 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: "#fff", marginBottom: 14, fontFamily: "'Inter', sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Kontak</div>
+            <div style={{ fontSize: 13.5, lineHeight: 2.2, fontFamily: "'Inter', sans-serif" }}>
               halo@fadtour.id
               <br />
               +62 812-3456-7890
@@ -1357,44 +1622,112 @@ function Footer({ setPage }) {
       </div>
       <div
         style={{
-          maxWidth: 1160,
-          margin: "32px auto 0",
-          paddingTop: 20,
-          borderTop: "1px solid rgba(183,200,200,0.15)",
-          fontSize: 12,
-          color: "#7F9494",
+          maxWidth: 1200,
+          margin: "36px auto 0",
+          paddingTop: 22,
+          borderTop: "1px solid rgba(255,255,255,0.1)",
+          fontSize: 12.5,
+          color: "rgba(255,255,255,0.4)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 12,
+          fontFamily: "'Inter', sans-serif",
         }}
       >
-        © 2026 FADTOUR. Seluruh hak cipta dilindungi.
+        <span>© 2026 FADTOUR. Seluruh hak cipta dilindungi.</span>
+        <div style={{ display: "flex", gap: 16 }}>
+          <span>Imprint</span>
+          <span>Privacy</span>
+        </div>
       </div>
     </footer>
   );
 }
 
+/* ─── App Root ─── */
 export default function FadtourApp() {
   ensureFonts();
   const [page, setPage] = useState("home");
   const [presetDestination, setPresetDestination] = useState("");
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["home", "about", "packages", "booking", "contact"];
+      let current = "home";
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 150) {
+            current = section;
+          }
+        }
+      }
+      setPage(current);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const goToBooking = (destination) => {
     setPresetDestination(destination ? destination.name : "");
-    setPage("booking");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    changePage("booking");
   };
 
   const changePage = (p) => {
     setPage(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const element = document.getElementById(p);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
   };
 
   return (
-    <div style={{ fontFamily: "'Manrope', sans-serif", background: PALETTE.page, color: PALETTE.ink, minHeight: "100vh" }}>
+    <div style={{ fontFamily: "'Inter', sans-serif", background: P.bgPage, color: P.text, minHeight: "100vh" }}>
       <Header page={page} setPage={changePage} />
-      {page === "home" && <HomePage setPage={changePage} goToBooking={goToBooking} />}
-      {page === "about" && <AboutPage />}
-      {page === "packages" && <PackagesPage goToBooking={goToBooking} />}
-      {page === "booking" && <BookingPage presetDestination={presetDestination} />}
-      {page === "contact" && <ContactPage />}
+      <style>{`
+        html { scroll-behavior: smooth; }
+        * { box-sizing: border-box; }
+        .fade-up {
+          opacity: 0;
+          transform: translateY(40px);
+          transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-up.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        input:focus, textarea:focus, select:focus {
+          border-color: ${P.primary} !important;
+          box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+        }
+        button:hover {
+          filter: brightness(1.05);
+        }
+      `}</style>
+      <FadeUp id="home">
+        <HomePage setPage={changePage} goToBooking={goToBooking} />
+      </FadeUp>
+      <FadeUp id="about">
+        <AboutPage />
+      </FadeUp>
+      <FadeUp id="packages">
+        <PackagesPage goToBooking={goToBooking} />
+      </FadeUp>
+      <FadeUp id="booking">
+        <BookingPage presetDestination={presetDestination} />
+      </FadeUp>
+      <FadeUp id="contact">
+        <ContactPage />
+      </FadeUp>
       <Footer setPage={changePage} />
     </div>
   );
