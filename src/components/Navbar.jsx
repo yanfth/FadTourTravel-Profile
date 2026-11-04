@@ -31,10 +31,10 @@ export default function Navbar() {
                 y="29.5"
                 textAnchor="middle"
                 fill="#FFFFFF"
-                fontFamily="Syne, Plus Jakarta Sans, sans-serif"
-                fontWeight="800"
-                fontSize="13.5"
-                letterSpacing="-0.4"
+                fontFamily="Outfit, Plus Jakarta Sans, sans-serif"
+                fontWeight="900"
+                fontSize="14"
+                letterSpacing="-0.3"
               >
                 FAD
               </text>
