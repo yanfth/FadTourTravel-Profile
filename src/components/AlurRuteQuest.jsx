@@ -477,8 +477,12 @@ export default function AlurRuteQuest({ currentPreset = 'studytour', onPresetCha
     scrollTriggerRef.current = ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.8,
+      end: () => `+=${window.innerHeight * (activeStopsRef.current.length >= 5 ? 4.5 : 3.5)}`,
+      pin: true,
+      pinSpacing: true,
+      scrub: 1.2,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
       onUpdate: self => {
         renderAtProgress(self.progress);
       }
@@ -557,9 +561,8 @@ export default function AlurRuteQuest({ currentPreset = 'studytour', onPresetCha
     <section
       ref={containerRef}
       id="alur-rute"
-      className="relative w-full h-[400vh] select-none bg-[#0B132B]"
+      className="relative w-full h-screen overflow-hidden select-none bg-[#0B132B]"
     >
-      <div className="sticky top-0 h-screen overflow-hidden">
       {/* LAYER 1: Dynamic Time-of-Day Sky Gradient */}
       <div
         ref={skyLayerRef}
@@ -769,7 +772,6 @@ export default function AlurRuteQuest({ currentPreset = 'studytour', onPresetCha
 
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
 }
