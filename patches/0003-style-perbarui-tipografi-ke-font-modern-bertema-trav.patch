@@ -1,0 +1,165 @@
+From 57897e79f917248f12464ca6f9de311015ced7c6 Mon Sep 17 00:00:00 2001
+From: ythStevin0 <404stevino@gmail.com>
+Date: Wed, 4 Nov 2026 21:22:18 +0700
+Subject: [PATCH 3/3] style: perbarui tipografi ke font modern bertema travel
+ (Outfit & Fraunces)
+
+---
+ index.html                |  6 +++---
+ src/components/Navbar.jsx |  8 ++++----
+ src/index.css             | 32 ++++++++++++++++++++++++--------
+ 3 files changed, 31 insertions(+), 15 deletions(-)
+
+diff --git a/index.html b/index.html
+index 6e5d21c..a3a5221 100644
+--- a/index.html
++++ b/index.html
+@@ -1,15 +1,15 @@
+ <!doctype html>
+-<html lang="id" class="scroll-smooth">
++<html lang="id">
+   <head>
+     <meta charset="UTF-8" />
+     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>FAD Tour & Travel — Gresik • Partner Perjalanan Seru & Interaktif</title>
+ 
+-    <!-- Google Fonts: Plus Jakarta Sans, Syne & Playfair Display -->
++    <!-- Google Fonts: Outfit (Display & Adventure), Plus Jakarta Sans (Body), & Fraunces (Editorial Accent) -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
++    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600;1,9..144,700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+   </head>
+   <body class="antialiased selection:bg-[#EF3340] selection:text-white bg-[#0B132B] text-[#0F172A]">
+     <div id="root"></div>
+diff --git a/src/components/Navbar.jsx b/src/components/Navbar.jsx
+index d19fe4a..8aaa9c9 100644
+--- a/src/components/Navbar.jsx
++++ b/src/components/Navbar.jsx
+@@ -31,10 +31,10 @@ export default function Navbar() {
+                 y="29.5"
+                 textAnchor="middle"
+                 fill="#FFFFFF"
+-                fontFamily="Syne, Plus Jakarta Sans, sans-serif"
+-                fontWeight="800"
+-                fontSize="13.5"
+-                letterSpacing="-0.4"
++                fontFamily="Outfit, Plus Jakarta Sans, sans-serif"
++                fontWeight="900"
++                fontSize="14"
++                letterSpacing="-0.3"
+               >
+                 FAD
+               </text>
+diff --git a/src/index.css b/src/index.css
+index 32fc004..9f6eb37 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -1,19 +1,29 @@
+ @import "tailwindcss";
+ 
+ @theme {
++  --color-fadRed: #EF3340;
+   --color-fad-red: #EF3340;
++  --color-fadRedDark: #D42230;
+   --color-fad-red-dark: #D42230;
+   --color-alabaster: #F8FAFC;
++  --color-oceanDark: #0B132B;
+   --color-ocean-dark: #0B132B;
++  --color-oceanDeep: #070D1D;
+   --color-ocean-deep: #070D1D;
+ 
+-  --font-sans: 'Plus Jakarta Sans', sans-serif;
+-  --font-display: 'Syne', 'Plus Jakarta Sans', sans-serif;
+-  --font-serif: 'Playfair Display', 'Georgia', serif;
++  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
++  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
++  --font-serif: 'Fraunces', Georgia, serif;
+ }
+ 
++* {
++  box-sizing: border-box;
++}
++
++html,
+ body {
+   margin: 0;
++  padding: 0;
+   font-family: 'Plus Jakarta Sans', sans-serif;
+   background-color: #0B132B;
+   color: #0F172A;
+@@ -24,13 +34,16 @@ body {
+   width: 8px;
+   height: 8px;
+ }
++
+ ::-webkit-scrollbar-track {
+   background: #070D1D;
+ }
++
+ ::-webkit-scrollbar-thumb {
+   background: #2563EB;
+   border-radius: 9999px;
+ }
++
+ ::-webkit-scrollbar-thumb:hover {
+   background: #EF3340;
+ }
+@@ -38,6 +51,7 @@ body {
+ .no-scrollbar::-webkit-scrollbar {
+   display: none;
+ }
++
+ .no-scrollbar {
+   -ms-overflow-style: none;
+   scrollbar-width: none;
+@@ -46,24 +60,24 @@ body {
+ /* Glassmorphism Utilities */
+ .glass-light-card {
+   background: rgba(255, 255, 255, 0.92);
+-  backdrop-filter: blur(18px);
+   -webkit-backdrop-filter: blur(18px);
++  backdrop-filter: blur(18px);
+   border: 1px solid rgba(255, 255, 255, 0.85);
+   box-shadow: 0 24px 48px -14px rgba(7, 13, 29, 0.28);
+ }
+ 
+ .glass-frosted-dark {
+   background: rgba(255, 255, 255, 0.12);
+-  backdrop-filter: blur(20px);
+   -webkit-backdrop-filter: blur(20px);
++  backdrop-filter: blur(20px);
+   border: 1px solid rgba(255, 255, 255, 0.22);
+   box-shadow: 0 25px 50px -12px rgba(5, 10, 22, 0.5);
+ }
+ 
+-/* Atmospheric Photo Vignette in Panoramic Sky */
++/* Subtle Atmospheric Photo Vignette in Panoramic Sky */
+ .zone-photo-vignette {
+-  -webkit-mask-image: radial-gradient(ellipse 75% 58% at 50% 58%, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.16) 55%, transparent 82%);
+-  mask-image: radial-gradient(ellipse 75% 58% at 50% 58%, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.16) 55%, transparent 82%);
++  -webkit-mask-image: radial-gradient(ellipse 75% 58% at 50% 58%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.16) 55%, transparent 82%);
++  mask-image: radial-gradient(ellipse 75% 58% at 50% 58%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.16) 55%, transparent 82%);
+ }
+ 
+ /* Active Stop Pin Pulse */
+@@ -77,6 +91,7 @@ body {
+     opacity: 0;
+   }
+ }
++
+ .pin-pulse-ring {
+   transform-box: fill-box;
+   transform-origin: center;
+@@ -87,6 +102,7 @@ body {
+ .tour-pkg-card {
+   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+ }
++
+ .tour-pkg-card:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 26px 52px -18px rgba(15, 23, 42, 0.16);
+-- 
+2.56.0.windows.2
+
