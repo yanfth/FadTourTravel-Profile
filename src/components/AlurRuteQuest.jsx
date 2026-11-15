@@ -483,6 +483,7 @@ export default function AlurRuteQuest({ currentPreset = 'studytour', onPresetCha
       scrub: 1.2,
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      refreshPriority: 1,
       onUpdate: self => {
         renderAtProgress(self.progress);
       }
