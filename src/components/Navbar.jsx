@@ -12,9 +12,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto rounded-full px-3.5 sm:px-5 py-2 bg-slate-950/80 backdrop-blur-md border border-white/10 shadow-2xl flex items-center justify-between gap-3 pointer-events-auto">
 
         {/* Official FAD Tour & Travel Red Suitcase Emblem */}
-        <a href="#beranda" className="flex items-center gap-3 group shrink-0">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-            <svg viewBox="0 0 64 64" className="w-7 h-7" aria-hidden="true">
+        <a href="#beranda" className="flex items-center gap-2.5 sm:gap-3 group min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform shrink-0">
+            <svg viewBox="0 0 64 64" className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true">
               {/* Suitcase Handle */}
               <path
                 d="M23 15 V9.5 C23 7.6 24.6 6 26.5 6 H37.5 C39.4 6 41 7.6 41 9.5 V15"
@@ -67,11 +67,11 @@ export default function Navbar() {
               <circle cx="43.5" cy="58.5" r="2.7" fill="#EF3340" />
             </svg>
           </div>
-          <div className="leading-tight">
-            <span className="text-white font-bold text-sm sm:text-[15px] tracking-tight block font-display">
+          <div className="leading-tight min-w-0">
+            <span className="text-white font-bold text-[13px] sm:text-[15px] tracking-tight block font-display truncate">
               FAD Tour &amp; Travel
             </span>
-            <span className="text-slate-400 text-[10px] font-semibold tracking-wider uppercase block">
+            <span className="text-slate-400 text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase block truncate">
               Gresik • Jawa Timur
             </span>
           </div>
@@ -90,13 +90,12 @@ export default function Navbar() {
         </nav>
 
         {/* Right Pill CTA & Mobile Hamburger */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <a
             href="#kontak"
-            className="bg-white hover:bg-[#EF3340] text-slate-950 hover:text-white text-xs font-extrabold px-4 sm:px-5 py-2.5 rounded-full transition-colors duration-300 shadow-sm flex items-center gap-1.5 font-display"
+            className="bg-white hover:bg-[#EF3340] text-slate-950 hover:text-white text-[11px] sm:text-xs font-extrabold px-3 sm:px-5 py-2 sm:py-2.5 rounded-full transition-colors duration-300 shadow-sm inline-flex items-center justify-center whitespace-nowrap font-display"
           >
-            <span>Rencanakan Trip</span>
-            <span>→</span>
+            Rencanakan Trip
           </a>
           <button
             onClick={toggleMobileMenu}
@@ -131,9 +130,9 @@ export default function Navbar() {
           <a
             href="#kontak"
             onClick={toggleMobileMenu}
-            className="mt-1 py-2.5 px-4 rounded-full bg-[#EF3340] text-center text-white text-xs font-bold font-display"
+            className="mt-1 py-2.5 px-4 rounded-full bg-[#EF3340] text-center text-white text-xs font-bold whitespace-nowrap font-display"
           >
-            Rencanakan Trip →
+            Rencanakan Trip
           </a>
         </div>
       )}

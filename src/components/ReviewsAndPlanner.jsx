@@ -1,11 +1,40 @@
 import { useState } from 'react';
 import { REVIEWS } from '../data/travelData';
+import locationIcon from '../assets/icon/Location.png';
+
+function TextInputField({ id, label, value, onChange, placeholder, iconSrc }) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-[11px] font-extrabold uppercase tracking-wider text-sky-200 mb-2">
+        {label}
+      </label>
+      <div className="relative flex items-center">
+        {iconSrc && (
+          <img
+            src={iconSrc}
+            alt=""
+            className="w-4 h-4 object-contain shrink-0 pointer-events-none absolute left-4"
+          />
+        )}
+        <input
+          id={id}
+          type="text"
+          required
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`w-full rounded-2xl bg-slate-950/85 border border-white/20 focus:border-sky-400 py-3.5 pr-4 text-sm text-white placeholder:text-slate-500 outline-none transition ${
+            iconSrc ? 'pl-10' : 'pl-4'
+          }`}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) {
-  const [origin, setOrigin] = useState('Gresik (Kota / Kebomas / Manyar)');
-  const [dest, setDest] = useState(
-    initialPackageSelection?.destSelect || 'Yogyakarta & Kunjungan Kampus'
-  );
+  const [origin, setOrigin] = useState('');
+  const [dest, setDest] = useState(initialPackageSelection?.destSelect || '');
   const [pax, setPax] = useState('45 - 55 Peserta (1 Big Bus Pariwisata)');
   const [chkSekolah, setChkSekolah] = useState(true);
   const [chkMasjid, setChkMasjid] = useState(true);
@@ -18,26 +47,25 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
 
   const getSelectedIntermediateStops = () => {
     const list = [];
-    if (chkSekolah) list.push('🏫 Jemput di Sekolah/Instansi');
-    if (chkMasjid) list.push('🕌 Singgah Masjid Pilihan');
-    if (chkRm) list.push('🍽️ Rumah Makan Prasmanan');
-    if (chkKampus) list.push('🎓 Kunjungan Kampus');
+    if (chkSekolah) list.push('Jemput di Sekolah/Instansi');
+    if (chkMasjid) list.push('Singgah Masjid Pilihan');
+    if (chkRm) list.push('Rumah Makan Prasmanan');
+    if (chkKampus) list.push('Kunjungan Kampus');
     return list;
   };
 
   const intermediateStops = getSelectedIntermediateStops();
-  const fullChain = [origin, ...intermediateStops, dest];
 
   const buildWhatsAppInquiryText = () => {
-    const stopsStr = intermediateStops.length ? intermediateStops.join(' → ') : 'Langsung ke tujuan utama';
+    const stopsStr = intermediateStops.length ? intermediateStops.join(', ') : 'Langsung ke tujuan utama';
     return (
-      `Halo Admin *FAD Tour & Travel* (0821-3156-8710) 👋\n` +
-      `Saya ingin merencanakan perjalanan rombongan dengan detail alur berikut:\n\n` +
-      `• *Asal Keberangkatan:* ${origin}\n` +
-      `• *Titik Singgahan:* ${stopsStr}\n` +
-      `• *Tujuan Akhir:* ${dest}\n` +
-      `• *Kapasitas Peserta:* ${pax}\n\n` +
-      `Mohon info rekomendasi jadwal, armada bus, dan penawaran biayanya. Terima kasih!`
+      `Halo Admin FAD Tour & Travel,\n` +
+      `Saya ingin merencanakan perjalanan rombongan dengan detail berikut:\n\n` +
+      `- Asal Keberangkatan: ${origin}\n` +
+      `- Tujuan Akhir: ${dest}\n` +
+      `- Kapasitas Peserta: ${pax}\n` +
+      `- Titik Singgahan: ${stopsStr}\n\n` +
+      `Mohon info jadwal, ketersediaan armada, dan estimasi biayanya. Terima kasih.`
     );
   };
 
@@ -133,8 +161,8 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
       </section>
 
       {/* CUSTOM MULTI-STOP TRIP PLANNER & FOOTER (#kontak) */}
-      <footer id="kontak" className="relative z-10 pt-10 pb-14 px-4 sm:px-6 lg:px-10">
-        <div className="max-w-7xl mx-auto space-y-16">
+      <footer id="kontak" className="relative z-10 pt-8 sm:pt-10 pb-10 sm:pb-14 px-4 sm:px-6 lg:px-10">
+        <div className="max-w-7xl mx-auto space-y-10 sm:space-y-16">
 
           {/* Interactive Multi-Stop Trip Builder Card */}
           <div className="glass-frosted-dark rounded-[32px] p-6 sm:p-9 lg:p-10">
@@ -155,47 +183,28 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
                 onClick={handleCopySummary}
                 className="self-start lg:self-auto px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-xs font-bold text-white transition cursor-pointer font-display"
               >
-                📋 Salin Rencana Rute
+              Salin Rencana Rute
               </button>
             </div>
 
             <form onSubmit={handleSendToWhatsApp} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="builder-origin" className="block text-[11px] font-extrabold uppercase tracking-wider text-sky-200 mb-2">
-                    1. Lokasi Jemput Awal
-                  </label>
-                  <select
-                    id="builder-origin"
-                    value={origin}
-                    onChange={(e) => setOrigin(e.target.value)}
-                    className="w-full rounded-2xl bg-slate-950/85 border border-white/20 focus:border-sky-400 px-4 py-3.5 text-sm text-white outline-none transition"
-                  >
-                    <option value="Gresik (Kota / Kebomas / Manyar)">📍 Gresik (Kota / Kebomas / Manyar)</option>
-                    <option value="Gresik Selatan (Menganti / Driyorejo)">📍 Gresik Selatan (Menganti / Driyorejo)</option>
-                    <option value="Surabaya & Sidoarjo">📍 Surabaya &amp; Sidoarjo</option>
-                    <option value="Lamongan & Tuban">📍 Lamongan &amp; Tuban</option>
-                  </select>
-                </div>
+                <TextInputField
+                  id="builder-origin"
+                  label="1. Lokasi Jemput Awal"
+                  value={origin}
+                  onChange={setOrigin}
+                  placeholder="Contoh: Gresik (Kota / Kebomas / Manyar)"
+                  iconSrc={locationIcon}
+                />
 
-                <div>
-                  <label htmlFor="builder-dest" className="block text-[11px] font-extrabold uppercase tracking-wider text-sky-200 mb-2">
-                    2. Destinasi Tujuan Akhir
-                  </label>
-                  <select
-                    id="builder-dest"
-                    value={dest}
-                    onChange={(e) => setDest(e.target.value)}
-                    className="w-full rounded-2xl bg-slate-950/85 border border-white/20 focus:border-sky-400 px-4 py-3.5 text-sm text-white outline-none transition"
-                  >
-                    <option value="Yogyakarta & Kunjungan Kampus">🏛️ Yogyakarta &amp; Kunjungan Kampus</option>
-                    <option value="Goes to Jakarta & PIK 2 Overland">🗼 Goes to Jakarta &amp; PIK 2 Overland</option>
-                    <option value="Bali Overland & Nusa Penida">🏝️ Bali Overland &amp; Nusa Penida</option>
-                    <option value="Bromo Sunrise & Malang Batu">⛰️ Bromo Sunrise &amp; Malang Batu</option>
-                    <option value="Komodo Island & Labuan Bajo">⛵ Komodo Island &amp; Labuan Bajo</option>
-                    <option value="Ziarah Wali Jatirogo / Jawa-Madura">🕌 Wisata Religi &amp; Ziarah Wali</option>
-                  </select>
-                </div>
+                <TextInputField
+                  id="builder-dest"
+                  label="2. Destinasi Tujuan Akhir"
+                  value={dest}
+                  onChange={setDest}
+                  placeholder="Contoh: Yogyakarta & Kunjungan Kampus"
+                />
 
                 <div>
                   <label htmlFor="builder-pax" className="block text-[11px] font-extrabold uppercase tracking-wider text-sky-200 mb-2">
@@ -263,47 +272,24 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
                 </div>
               </div>
 
-              {/* Live Route Preview + Direct WhatsApp CTA */}
-              <div className="p-4 rounded-2xl bg-slate-950/75 border border-white/15 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-sky-300 block">
-                    Alur Perjalanan Terpilih:
-                  </span>
-                  <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-white">
-                    {fullChain.map((label, i) => (
-                      <span key={i} className="flex items-center gap-1.5">
-                        <span
-                          className={`px-2.5 py-1 rounded-full ${
-                            i === 0 || i === fullChain.length - 1
-                              ? 'bg-white text-slate-950'
-                              : 'bg-white/15 border border-white/20 text-white'
-                          } text-[11px] font-bold`}
-                        >
-                          {label}
-                        </span>
-                        {i < fullChain.length - 1 && <span className="text-sky-300 font-bold">→</span>}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
+              {/* Direct WhatsApp CTA */}
+              <div className="flex justify-end pt-2">
                 <button
                   type="submit"
-                  className="shrink-0 rounded-full bg-[#EF3340] hover:bg-white text-white hover:text-slate-950 font-extrabold text-xs sm:text-sm px-7 py-4 transition-colors duration-300 shadow-xl flex items-center justify-center gap-2 cursor-pointer font-display"
+                  className="w-full sm:w-auto shrink-0 rounded-full bg-[#EF3340] hover:bg-white text-white hover:text-slate-950 font-extrabold text-xs sm:text-sm px-7 py-4 transition-colors duration-300 shadow-xl flex items-center justify-center gap-2 cursor-pointer font-display"
                 >
-                  <span>Kirim ke WhatsApp 0821-3156-8710</span>
-                  <span>→</span>
+                  <span>Kirim ke WhatsApp FAD Tours</span>
                 </button>
               </div>
             </form>
           </div>
 
           {/* Editorial Footer Columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pt-4 border-t border-white/10">
-            <div className="lg:col-span-5 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shrink-0">
-                  <svg viewBox="0 0 64 64" className="w-7 h-7" aria-hidden="true">
+          <div className="grid grid-cols-3 lg:grid-cols-12 gap-x-3 gap-y-6 sm:gap-8 lg:gap-10 pt-4 border-t border-white/10">
+            <div className="col-span-3 lg:col-span-5 space-y-2.5 sm:space-y-4">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 64 64" className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true">
                     <path d="M23 15 V9.5 C23 7.6 24.6 6 26.5 6 H37.5 C39.4 6 41 7.6 41 9.5 V15" fill="none" stroke="#EF3340" strokeWidth="3.6" strokeLinecap="round" />
                     <rect x="12" y="14" width="40" height="41" rx="8" fill="#EF3340" />
                     <text x="32" y="29.5" textAnchor="middle" fill="#FFFFFF" fontFamily="Outfit, Plus Jakarta Sans, sans-serif" fontWeight="900" fontSize="14" letterSpacing="-0.3">FAD</text>
@@ -314,18 +300,18 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
                   </svg>
                 </div>
                 <div>
-                  <h4 className="font-display font-extrabold text-lg text-white">FAD Tour &amp; Travel</h4>
-                  <p className="text-xs text-sky-300">Gresik • Jawa Timur • Indonesia</p>
+                  <h4 className="font-display font-extrabold text-base sm:text-lg text-white">FAD Tour &amp; Travel</h4>
+                  <p className="text-[11px] sm:text-xs text-sky-300">Gresik • Jawa Timur • Indonesia</p>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-md">
+              <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-md">
                 Biro perjalanan wisata rombongan sekolah, kunjungan kampus, komunitas, ziarah religi, hingga tur keluarga lintas kota dan kepulauan dengan layanan hangat dan armada prima.
               </p>
             </div>
 
-            <div className="lg:col-span-2 space-y-3">
-              <h5 className="text-xs font-extrabold uppercase tracking-wider text-sky-300 font-display">Navigasi</h5>
-              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300">
+            <div className="col-span-1 lg:col-span-2 space-y-2 sm:space-y-3 min-w-0">
+              <h5 className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-sky-300 font-display">Navigasi</h5>
+              <ul className="space-y-1.5 sm:space-y-2.5 text-[11px] sm:text-sm text-slate-300">
                 <li><a href="#beranda" className="hover:text-white transition">Beranda</a></li>
                 <li><a href="#alur-rute" className="hover:text-white transition">Alur Rute</a></li>
                 <li><a href="#paket" className="hover:text-white transition">Paket Wisata</a></li>
@@ -334,9 +320,9 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
               </ul>
             </div>
 
-            <div className="lg:col-span-2 space-y-3">
-              <h5 className="text-xs font-extrabold uppercase tracking-wider text-sky-300 font-display">Rute Favorit</h5>
-              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300">
+            <div className="col-span-1 lg:col-span-2 space-y-2 sm:space-y-3 min-w-0">
+              <h5 className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-sky-300 font-display">Rute Favorit</h5>
+              <ul className="space-y-1.5 sm:space-y-2.5 text-[11px] sm:text-sm text-slate-300">
                 <li><a href="#paket" className="hover:text-white transition">Goes to Jakarta</a></li>
                 <li><a href="#paket" className="hover:text-white transition">Komodo Island</a></li>
                 <li><a href="#paket" className="hover:text-white transition">Yogyakarta &amp; Kampus</a></li>
@@ -345,21 +331,21 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
               </ul>
             </div>
 
-            <div className="lg:col-span-3 space-y-3">
-              <h5 className="text-xs font-extrabold uppercase tracking-wider text-sky-300 font-display">Info &amp; Reservasi</h5>
-              <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#EF3340] mt-0.5">📍</span>
-                  <span>Kabupaten Gresik, Jawa Timur<br /><span className="text-slate-500 text-xs">Layanan jemput Gresik, Surabaya, Sidoarjo, Lamongan</span></span>
+            <div className="col-span-1 lg:col-span-3 space-y-2 sm:space-y-3 min-w-0">
+              <h5 className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-sky-300 font-display">Info &amp; Reservasi</h5>
+              <ul className="space-y-2 sm:space-y-3 text-[11px] sm:text-sm text-slate-300 break-words">
+                <li className="flex items-start gap-1.5 sm:gap-2.5">
+                  <span className="text-[#EF3340] mt-0.5 shrink-0">📍</span>
+                  <span>Kabupaten Gresik, Jawa Timur<br /><span className="text-slate-500 text-[10px] sm:text-xs leading-tight block mt-0.5">Layanan jemput Gresik, Surabaya, Sidoarjo, Lamongan</span></span>
                 </li>
                 <li>
                   <a
                     href="https://wa.me/6282131568710"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-white hover:text-[#EF3340] font-bold transition"
+                    className="inline-flex items-start gap-1.5 sm:gap-2 text-white hover:text-[#EF3340] font-bold transition"
                   >
-                    <span>📞</span>
+                    <span className="shrink-0">📞</span>
                     <span>0821-3156-8710 (WhatsApp)</span>
                   </a>
                 </li>
@@ -368,17 +354,17 @@ export default function ReviewsAndPlanner({ initialPackageSelection, onToast }) 
                     href="https://instagram.com/fadtourtravel"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-white hover:text-[#EF3340] font-bold transition"
+                    className="inline-flex items-start gap-1.5 sm:gap-2 text-white hover:text-[#EF3340] font-bold transition"
                   >
-                    <span>📸</span>
-                    <span>@fadtourtravel</span>
+                    <span className="shrink-0">📸</span>
+                    <span className="break-all">@fadtourtravel</span>
                   </a>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <div className="pt-4 sm:pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-[11px] sm:text-xs text-slate-500 text-center sm:text-left">
             <p>© 2026 FAD Tour &amp; Travel Gresik. Seluruh hak cipta dilindungi.</p>
             <p>Perjalanan nyaman • Singgah terarah • Kenangan tak terlupakan.</p>
           </div>
